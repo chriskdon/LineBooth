@@ -1,5 +1,6 @@
-### Project Outline ###
+## Project Outline ##
 
+### Steps ###
 1. sense motion
 2. edge detect
 3. extract foreground
