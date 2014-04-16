@@ -28,6 +28,10 @@ public class LineBoothState {
         return output;
     }
 
+    public void setOutput(BufferedImage img) {
+        this.output = img;
+    }
+
     public int getWidth() {
         return background.getWidth();
     }
