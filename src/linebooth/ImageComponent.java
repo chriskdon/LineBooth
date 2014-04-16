@@ -12,16 +12,16 @@ import java.io.IOException;
  * Student #: 4810800
  * Date: 2014-04-13.
  */
-public class ImagePanel extends JPanel {
+public class ImageComponent extends JComponent {
     private BufferedImage img;
 
-    public ImagePanel(String path) {
+    public ImageComponent(String path) {
         super();
 
         setImage(path);
     }
 
-    public ImagePanel() {
+    public ImageComponent() {
         super();
     }
 
