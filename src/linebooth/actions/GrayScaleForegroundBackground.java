@@ -34,7 +34,7 @@ public class GrayScaleForegroundBackground implements IPipelineAction<LineBoothS
      */
     private int grayscale(int rgb) {
         Color c = new Color(rgb);
-        int g = (c.getRed() + c.getGreen() + c.getBlue())/3;
+        int g = (int)((0.21*c.getRed()) + (0.71*c.getGreen()) + (0.07*c.getBlue()));
 
         return new Color(g, g, g).getRGB();
     }

@@ -2,6 +2,7 @@ import linebooth.ImageComponent;
 import linebooth.LineBoothState;
 import linebooth.PipelineTransformer;
 import linebooth.actions.GrayScaleForegroundBackground;
+import linebooth.actions.OtsuBinarization;
 import linebooth.actions.WinnemollerBinarization;
 
 import javax.imageio.ImageIO;
@@ -47,15 +48,16 @@ public class Main {
         JFrame frame = new JFrame();
         ImageComponent imageComponent = new ImageComponent();
 
-        BufferedImage background = imageToBufferedImage(getImage("./assets/background.jpg"));
+        BufferedImage background = imageToBufferedImage(getImage("./assets/foreground.jpg"));
         BufferedImage foreground = imageToBufferedImage(getImage("./assets/foreground.jpg"));
 
         frame.add(imageComponent);
         frame.setSize(background.getWidth(), background.getHeight());
 
         BufferedImage processed = new PipelineTransformer<LineBoothState>(new LineBoothState(background, foreground))
-                .action(new GrayScaleForegroundBackground()) // Change foreground and background to gray
-                .action(new WinnemollerBinarization(3, 1.5f, 5f))
+                .action(new GrayScaleForegroundBackground())             // Change foreground and background to gray
+                .action(new WinnemollerBinarization(3, 5, 1/3f, 9.4f, 1f))
+                //.action(new OtsuBinarization())
                 .result().getOutput();
 
         imageComponent.setImage(processed);

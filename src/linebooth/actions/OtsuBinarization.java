@@ -74,7 +74,7 @@ public class OtsuBinarization implements IPipelineAction<LineBoothState> {
             for(int y = 0; y < src.getHeight(); y++) {
                 int gray = new Color(src.getRGB(x, y)).getRed();
 
-                if(gray > threshold) {
+                if(gray < threshold) {
                     dest.setRGB(x, y, new Color(255, 255, 255).getRGB());
                 } else {
                     dest.setRGB(x, y, new Color(0,0,0).getRGB());

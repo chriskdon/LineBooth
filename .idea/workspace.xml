@@ -23,11 +23,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Main.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="Main.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-46.5" vertical-offset="657" max-vertical-offset="1095">
-              <caret line="50" column="51" selection-start-line="50" selection-start-column="51" selection-end-line="50" selection-end-column="51" />
+            <state vertical-scroll-proportion="0.42045453" vertical-offset="685" max-vertical-offset="1125">
+              <caret line="58" column="61" selection-start-line="58" selection-start-column="61" selection-end-line="58" selection-end-column="61" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -35,15 +35,51 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WinnemollerBinarization.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/linebooth/actions/WinnemollerBinarization.java">
+      <file leaf-file-name="GrayScaleForegroundBackground.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/linebooth/actions/GrayScaleForegroundBackground.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.47019866" vertical-offset="1242" max-vertical-offset="1725">
-              <caret line="97" column="52" selection-start-line="97" selection-start-column="50" selection-end-line="97" selection-end-column="50" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="252" max-vertical-offset="705">
+              <caret line="31" column="17" selection-start-line="31" selection-start-column="17" selection-end-line="31" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1649#1650#0" expanded="true" />
-                <element signature="e#1711#1712#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OtsuBinarization.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/linebooth/actions/OtsuBinarization.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="525" max-vertical-offset="1500">
+              <caret line="76" column="25" selection-start-line="76" selection-start-column="25" selection-end-line="76" selection-end-column="25" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Utils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/linebooth/Utils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="222" max-vertical-offset="705">
+              <caret line="25" column="9" selection-start-line="25" selection-start-column="9" selection-end-line="25" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WinnemollerBinarization.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/linebooth/actions/WinnemollerBinarization.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-54.0" vertical-offset="567" max-vertical-offset="1935">
+              <caret line="45" column="10" selection-start-line="45" selection-start-column="10" selection-end-line="45" selection-end-column="10" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1900#1901#0" expanded="true" />
+                <element signature="e#1962#1963#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -64,12 +100,12 @@
         <option value="$PROJECT_DIR$/src/linebooth/IPipelineAction.java" />
         <option value="$PROJECT_DIR$/src/linebooth/PiplineTransformer.java" />
         <option value="$PROJECT_DIR$/src/linebooth/PipelineTransformer.java" />
-        <option value="$PROJECT_DIR$/src/linebooth/actions/GrayScaleForegroundBackground.java" />
-        <option value="$PROJECT_DIR$/src/linebooth/actions/OtsuBinarization.java" />
         <option value="$PROJECT_DIR$/src/linebooth/Utils.java" />
         <option value="$PROJECT_DIR$/src/linebooth/LineBoothState.java" />
-        <option value="$PROJECT_DIR$/src/Main.java" />
+        <option value="$PROJECT_DIR$/src/linebooth/actions/GrayScaleForegroundBackground.java" />
+        <option value="$PROJECT_DIR$/src/linebooth/actions/OtsuBinarization.java" />
         <option value="$PROJECT_DIR$/src/linebooth/actions/WinnemollerBinarization.java" />
+        <option value="$PROJECT_DIR$/src/Main.java" />
       </list>
     </option>
   </component>
@@ -498,12 +534,12 @@
       <workItem from="1397593183129" duration="86000" />
       <workItem from="1397595855769" duration="6540000" />
       <workItem from="1397612663045" duration="3144000" />
-      <workItem from="1397616209079" duration="23690000" />
+      <workItem from="1397616209079" duration="33700000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="38008000" />
+    <option name="totallyTimeSpent" value="48018000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1280" height="774" extended-state="6" />
@@ -531,7 +567,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20390625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2916053" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2916053" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -668,16 +704,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/linebooth/actions/GrayScaleForegroundBackground.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6357616" vertical-offset="162" max-vertical-offset="705">
-          <caret line="30" column="40" selection-start-line="30" selection-start-column="32" selection-end-line="30" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/linebooth/LineBoothState.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.56953645" vertical-offset="102" max-vertical-offset="615">
@@ -693,10 +719,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/linebooth/actions/OtsuBinarization.java">
+    <entry file="file://$PROJECT_DIR$/src/linebooth/actions/GrayScaleForegroundBackground.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.2582781" vertical-offset="0" max-vertical-offset="1500">
-          <caret line="38" column="24" selection-start-line="38" selection-start-column="24" selection-end-line="38" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="252" max-vertical-offset="705">
+          <caret line="31" column="17" selection-start-line="31" selection-start-column="17" selection-end-line="31" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -705,18 +731,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/linebooth/Utils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33774835" vertical-offset="222" max-vertical-offset="705">
-          <caret line="25" column="44" selection-start-line="25" selection-start-column="9" selection-end-line="25" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="222" max-vertical-offset="705">
+          <caret line="25" column="9" selection-start-line="25" selection-start-column="9" selection-end-line="25" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Main.java">
+    <entry file="file://$PROJECT_DIR$/src/linebooth/actions/OtsuBinarization.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-46.5" vertical-offset="657" max-vertical-offset="1095">
-          <caret line="50" column="51" selection-start-line="50" selection-start-column="51" selection-end-line="50" selection-end-column="51" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="525" max-vertical-offset="1500">
+          <caret line="76" column="25" selection-start-line="76" selection-start-column="25" selection-end-line="76" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -725,12 +751,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/linebooth/actions/WinnemollerBinarization.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.47019866" vertical-offset="1242" max-vertical-offset="1725">
-          <caret line="97" column="52" selection-start-line="97" selection-start-column="50" selection-end-line="97" selection-end-column="50" />
+        <state vertical-scroll-proportion="-54.0" vertical-offset="567" max-vertical-offset="1935">
+          <caret line="45" column="10" selection-start-line="45" selection-start-column="10" selection-end-line="45" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1649#1650#0" expanded="true" />
-            <element signature="e#1711#1712#0" expanded="true" />
+            <element signature="e#1900#1901#0" expanded="true" />
+            <element signature="e#1962#1963#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.42045453" vertical-offset="685" max-vertical-offset="1125">
+          <caret line="58" column="61" selection-start-line="58" selection-start-column="61" selection-end-line="58" selection-end-column="61" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
