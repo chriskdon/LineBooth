@@ -56,7 +56,7 @@ public class Main {
 
         BufferedImage processed = new PipelineTransformer<LineBoothState>(new LineBoothState(background, foreground))
                 .action(new GrayScaleForegroundBackground())             // Change foreground and background to gray
-                .action(new WinnemollerBinarization(3, 5, 1/3f, 9.4f, 1f))
+                .action(new WinnemollerBinarization(2f, 1.6f))
                 //.action(new OtsuBinarization())
                 .result().getOutput();
 

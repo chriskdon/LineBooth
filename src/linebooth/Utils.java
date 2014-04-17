@@ -12,7 +12,6 @@ public class Utils {
     /**
      * Flatten 2D array to 1D
      * @param arr
-     * @param <T>
      * @return
      */
     public static float[] flatten(float[][] arr) {

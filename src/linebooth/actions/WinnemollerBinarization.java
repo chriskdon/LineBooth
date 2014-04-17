@@ -19,22 +19,15 @@ import java.awt.image.Kernel;
 public class WinnemollerBinarization implements IPipelineAction<LineBoothState> {
     private float scale = 0;
     private float change = 1;
-    private int size = 1;
-    private int otherSize = 1;
-    private float sensitivity = 1.5f;
 
     /**
      * Constructor
-     *
-     * @param size  Matrix size for the kernel.
+
      * @param scale Scale factor for the kernel.
      */
-    public WinnemollerBinarization(int size, int otherSize, float scale, float change, float sensitivity) {
-        this.size = size;
-        this.otherSize = otherSize;
+    public WinnemollerBinarization(float scale, float change) {
         this.scale = scale;
         this.change = change;
-        this.sensitivity = sensitivity;
     }
 
     /**
@@ -42,7 +35,7 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
      *
      * @return 1D array of the kernel
      */
-    private float[] centredGaussKernel(int size, float scale) {
+    private float[] centredGaussKernel(int size, float scale, float multiplier) {
         //if(scale <= 1) { throw new IllegalArgumentException("Scaling factor must be > 1."); }
 
         float[][] kernel = new float[size][size];
@@ -55,9 +48,11 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
             for(int x = -radius; x < size - radius; x++) {
                 float central = -(((y*y) + (x*x))/(2f * (scale*scale)));
 
-                kernel[y + radius][x + radius] = eulerPart * (float)Math.exp(central);
+                kernel[y + radius][x + radius] = multiplier * eulerPart * (float)Math.exp(central);
             }
         }
+
+        Utils.print(kernel);
 
         return Utils.flatten(kernel);
     }
@@ -68,18 +63,28 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
      * @return
      */
     private int normalize(int value) {
-      return value > 255 ? 255 : value < 0 ? 0 : value;
+      if(value >= 255) {
+          return 255;
+      } else if(value <= 0) {
+          return 0;
+      } else {
+          return value;
+      }
     }
 
     private BufferedImage getL1(BufferedImage src) {
-        ConvolveOp l1Op = new ConvolveOp(new Kernel(size, size, centredGaussKernel(size, scale)));
+        int size = (int)((6*scale) - 1);
+
+        ConvolveOp l1Op = new ConvolveOp(new Kernel(size, size, centredGaussKernel(size, scale, 1)));
         BufferedImage l1 = l1Op.filter(src, null);
 
         return l1;
     }
 
     private BufferedImage getL2(BufferedImage src) {
-        ConvolveOp l2Op = new ConvolveOp(new Kernel(otherSize, otherSize, centredGaussKernel(otherSize, scale * change)));
+        int otherSize = (int)((6*scale*change) - 1);
+
+        ConvolveOp l2Op = new ConvolveOp(new Kernel(otherSize, otherSize, centredGaussKernel(otherSize, scale, change)));
         BufferedImage l2 = l2Op.filter(src, null);
 
         return l2;
@@ -90,7 +95,7 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
      * @param src
      * @return
      */
-    private BufferedImage dogEdgeDetector(BufferedImage src) {
+    private BufferedImage diffOfGauss(BufferedImage src) {
         BufferedImage l1 = getL1(src);
         BufferedImage l2 = getL2(src);
 
@@ -101,9 +106,9 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
                 Color c1 = new Color(l1.getRGB(x, y));
                 Color c2 = new Color(l2.getRGB(x, y));
 
-                int red = normalize(c1.getRed() - (int)((c2.getRed()*sensitivity)));
-                int green = normalize(c1.getGreen() - (int)((c2.getGreen()*sensitivity)));
-                int blue = normalize(c1.getBlue() - (int)((c2.getBlue()*sensitivity)));
+                int red = normalize(c2.getRed() - (c1.getRed()));
+                int green = normalize(c2.getGreen() - (c1.getGreen()));
+                int blue = normalize(c2.getBlue() - (c1.getBlue()));
 
                 dog.setRGB(x, y, new Color(red, green, blue).getRGB());
             }
@@ -114,7 +119,7 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
 
     @Override
     public LineBoothState action(LineBoothState state) {
-        BufferedImage dog = dogEdgeDetector(state.getForeground());
+        BufferedImage dog = diffOfGauss(state.getForeground());
 
         state.setOutput(dog);
 
