@@ -14,6 +14,7 @@ public class LineBoothState {
         this.foreground = f;
 
         this.output = new BufferedImage(b.getWidth(), b.getHeight(), BufferedImage.TYPE_INT_RGB);
+        foreground.copyData(this.output.getRaster()); // Debug copy foreground
     }
 
     public BufferedImage getBackground() {

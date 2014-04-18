@@ -16,11 +16,13 @@ public class GrayScaleForegroundBackground implements IPipelineAction<LineBoothS
     public LineBoothState action(LineBoothState state) {
         BufferedImage background = state.getBackground();
         BufferedImage foreground = state.getForeground();
+        BufferedImage output = state.getOutput();
 
         for(int x = 0; x < state.getWidth(); x++) {
             for(int y = 0; y < state.getHeight(); y++) {
                 background.setRGB(x, y, grayscale(background.getRGB(x, y)));
                 foreground.setRGB(x, y, grayscale(foreground.getRGB(x, y)));
+                output.setRGB(x, y, grayscale(output.getRGB(x, y)));
             }
         }
 
