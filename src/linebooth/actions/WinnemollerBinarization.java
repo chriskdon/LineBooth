@@ -6,7 +6,6 @@ import linebooth.Utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageFilter;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 
@@ -19,16 +18,26 @@ import java.awt.image.Kernel;
  */
 public class WinnemollerBinarization implements IPipelineAction<LineBoothState> {
     private float scale = 0;
-    private float change = 1;
+    private float change = 1f;
+    private float differenceSensitivity = 1.25f;
+    private float sharpenAmount = 0.7f;
+    private float thresholdSensitivity = 1.5f;
+    private int threshold = 180;
 
     /**
      * Constructor
      *
      * @param scale Scale factor for the kernel.
      */
-    public WinnemollerBinarization(float scale, float change) {
+    public WinnemollerBinarization(float scale, float change,
+                                   float differenceSensitivity, float sharpenAmount,
+                                   float thresholdSensitivity, int threshold) {
         this.scale = scale;
         this.change = change;
+        this.differenceSensitivity = differenceSensitivity;
+        this.sharpenAmount = sharpenAmount;
+        this.thresholdSensitivity = thresholdSensitivity;
+        this.threshold = threshold;
     }
 
     /**
@@ -110,11 +119,10 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
                 Color c2 = new Color(l2.getRGB(x, y));
 
                 int bias = 0;
-                float t = 1.25f;
 
-                int red = normalize(c1.getRed() - (int)(c2.getRed() * t) + bias);
-                int green = normalize(c1.getGreen() - (int)(c2.getGreen() * t) + bias);
-                int blue = normalize(c1.getBlue() - (int)(c2.getBlue() * t) + bias);
+                int red = normalize(c1.getRed() - (int)(c2.getRed() * differenceSensitivity) + bias);
+                int green = normalize(c1.getGreen() - (int)(c2.getGreen() * differenceSensitivity) + bias);
+                int blue = normalize(c1.getBlue() - (int)(c2.getBlue() * differenceSensitivity) + bias);
 
                 dog.setRGB(x, y, new Color(red, green, blue).getRGB());
             }
@@ -160,11 +168,10 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
                 Color cD = new Color(D.getRGB(x, y));
 
                 int bias = 0;
-                float p = 0.7f;
 
-                int red = normalize(cG.getRed() + (int)(cD.getRed() * p) + bias);
-                int green = normalize(cG.getGreen() + (int)(cD.getGreen() * p) + bias);
-                int blue = normalize(cG.getBlue() + (int)(cD.getBlue() * p) + bias);
+                int red = normalize(cG.getRed() + (int)(cD.getRed() * sharpenAmount) + bias);
+                int green = normalize(cG.getGreen() + (int)(cD.getGreen() * sharpenAmount) + bias);
+                int blue = normalize(cG.getBlue() + (int)(cD.getBlue() * sharpenAmount) + bias);
 
                 S.setRGB(x, y, new Color(red, green, blue).getRGB());
             }
@@ -181,15 +188,12 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
             for (int y = 0; y < src.getHeight(); y++) {
                 Color c = new Color(S.getRGB(x, y));
 
-                if(c.getRed() >= 180) {
+                if(c.getRed() >= threshold) {
                     T.setRGB(x, y, new Color(255, 255, 255).getRGB());
                 } else {
-                    float p = 1.5f;
                     float bias = 0;
 
-                    int value = (int)Math.tanh(p * (c.getRed() - bias));
-
-                    System.out.println(value);
+                    int value = (int)Math.tanh(thresholdSensitivity * (c.getRed() - bias));
 
                     T.setRGB(x, y, new Color(value, value, value).getRGB());
                 }

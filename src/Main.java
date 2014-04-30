@@ -1,6 +1,6 @@
-import linebooth.ImageComponent;
-import linebooth.LineBoothState;
-import linebooth.PipelineTransformer;
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamPanel;
+import linebooth.*;
 import linebooth.actions.*;
 
 import javax.imageio.ImageIO;
@@ -43,27 +43,20 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
+        // Dithering
+
         ImageComponent imageComponent = new ImageComponent();
 
-        BufferedImage background = imageToBufferedImage(getImage("./assets/person.png"));
-        BufferedImage foreground = imageToBufferedImage(getImage("./assets/person.png"));
-
-        frame.add(imageComponent);
-        frame.setSize(background.getWidth(), background.getHeight());
+        BufferedImage background = imageToBufferedImage(getImage("./assets/foreground_320x240.png"));
+        BufferedImage foreground = imageToBufferedImage(getImage("./assets/foreground_320x240.png"));
 
         BufferedImage processed = new PipelineTransformer<LineBoothState>(new LineBoothState(background, foreground))
                 .action(new GrayScaleForegroundBackground())             // Change foreground and background to gray
-                .action(new WinnemollerBinarization(1f, 1.6f))
-                // .action(new OtsuBinarization())
-                //.action(new Sobel())
-                //.action(new InvertOutput())
+                .action(new WinnemollerBinarization(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180))
                 .result().getOutput();
 
         imageComponent.setImage(processed);
 
-        frame.setVisible(true);
-        frame.setResizable(false);
-        frame.setTitle("Line Booth");
+        new MainFrame(imageComponent);
     }
 }
