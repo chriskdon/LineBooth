@@ -12,17 +12,11 @@ import java.io.IOException;
  * Student #: 4810800
  * Date: 2014-04-13.
  */
-public class ImageComponent extends JComponent {
+public class ImageComponent extends JPanel {
     private BufferedImage img;
 
-    public ImageComponent(String path) {
-        super();
-
-        setImage(path);
-    }
-
-    public ImageComponent() {
-        super();
+    public ImageComponent(Dimension d) {
+        this.setPreferredSize(d);
     }
 
     /**
@@ -32,34 +26,13 @@ public class ImageComponent extends JComponent {
     public void setImage(BufferedImage img) {
         this.img = img;
 
-        this.updateUI();
-    }
-
-    public Graphics2D getGraphicsContext() {
-        return getImage().createGraphics();
-    }
-
-    public BufferedImage getImage() {
-        if(img == null) {
-            throw new RuntimeException("No Image Set");
-        }
-
-        return img;
-    }
-
-    /**
-     * Set the image to the path;
-     * @param path
-     */
-    public void setImage(String path) {
-        try {
-            setImage(ImageIO.read(new File(path)));
-        } catch (IOException e) {
-        }
+        this.repaint();
     }
 
     @Override
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
         g.clearRect(0, 0, this.getWidth(), this.getHeight());
 
         if(img != null) {

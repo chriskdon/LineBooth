@@ -3,8 +3,8 @@ package linebooth.actions;
 import linebooth.IPipelineAction;
 import linebooth.LineBoothState;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 /**
  * Created by Chris Kellendonk
@@ -13,31 +13,28 @@ import java.awt.image.BufferedImage;
  */
 public class GrayScaleForegroundBackground implements IPipelineAction<LineBoothState> {
     @Override
-    public LineBoothState action(LineBoothState state) {
-        BufferedImage background = state.getBackground();
-        BufferedImage foreground = state.getForeground();
-        BufferedImage output = state.getOutput();
+    public void action(LineBoothState state) {
+        int[] fData = ((DataBufferInt) state.getForeground().getRaster().getDataBuffer()).getData();
+        int[] bData = ((DataBufferInt) state.getBackground().getRaster().getDataBuffer()).getData();
+        int[] oData = ((DataBufferInt) state.getOutput().getRaster().getDataBuffer()).getData();
 
-        for(int x = 0; x < state.getWidth(); x++) {
-            for(int y = 0; y < state.getHeight(); y++) {
-                background.setRGB(x, y, grayscale(background.getRGB(x, y)));
-                foreground.setRGB(x, y, grayscale(foreground.getRGB(x, y)));
-                output.setRGB(x, y, grayscale(output.getRGB(x, y)));
-            }
+        for (int i = 0; i < state.getWidth() * state.getHeight(); i++) {
+            fData[i] = grayscale(fData[i]);
+            bData[i] = grayscale(bData[i]);
+            oData[i] = grayscale(oData[i]);
         }
-
-        return state;
     }
+
 
     /**
      * Convert RGB to grayscale.
-     * @param rgb
+     *
+     * @param argb
      * @return
      */
-    private int grayscale(int rgb) {
-        Color c = new Color(rgb);
-        int g = (int)((0.21*c.getRed()) + (0.71*c.getGreen()) + (0.07*c.getBlue()));
+    private int grayscale(int argb) {
+        int g = (int) ((0.21 * ((argb >> 16) & 0xFF)) + (0.71 * ((argb >> 8) & 0xFF)) + (0.07 * (argb & 0xFF)));
 
-        return new Color(g, g, g).getRGB();
+        return (argb & 0xFF000000) | (g << 16) | (g << 8) | g;
     }
 }

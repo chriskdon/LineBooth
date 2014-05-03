@@ -31,6 +31,10 @@ public class ExtendedWebcamPanel extends DetectClosePanel {
         this(SIZE_320_240);
     }
 
+    public Webcam getWebcam() {
+        return this.cam;
+    }
+
     @Override
     public void onClose() {
         cam.close();

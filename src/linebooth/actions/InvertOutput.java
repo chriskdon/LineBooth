@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
  */
 public class InvertOutput implements IPipelineAction<LineBoothState> {
     @Override
-    public LineBoothState action(LineBoothState state) {
+    public void action(LineBoothState state) {
         BufferedImage src = state.getOutput();
 
         for(int x = 0; x < src.getWidth(); x++) {
@@ -23,7 +23,5 @@ public class InvertOutput implements IPipelineAction<LineBoothState> {
                 src.setRGB(x, y, new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue()).getRGB());
             }
         }
-
-        return state;
     }
 }

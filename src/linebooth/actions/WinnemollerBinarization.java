@@ -17,12 +17,17 @@ import java.awt.image.Kernel;
  * Date: 2014-04-16.
  */
 public class WinnemollerBinarization implements IPipelineAction<LineBoothState> {
-    private float scale = 0;
+    private float scale = 1;
     private float change = 1f;
     private float differenceSensitivity = 1.25f;
     private float sharpenAmount = 0.7f;
     private float thresholdSensitivity = 1.5f;
     private int threshold = 180;
+
+    public void setScale(float x) {
+        scale = x;
+    }
+
 
     /**
      * Constructor
@@ -204,9 +209,7 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
     }
 
     @Override
-    public LineBoothState action(LineBoothState state) {
+    public void action(LineBoothState state) {
         state.setOutput(threshold(state.getOutput()));
-
-        return state;
     }
 }
