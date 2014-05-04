@@ -395,8 +395,8 @@ class BluetoothStackWIDCOMM implements BluetoothStack {
             }
 
             /*
-             * This function may trigger multiple times per inquiry – even
-             * multiple times per device – once for the address alone, and once
+             * This function may trigger multiple times per inquiry ï¿½ even
+             * multiple times per device ï¿½ once for the address alone, and once
              * for the address and the user-friendly name.
              */
             public void deviceDiscoveredCallback(DiscoveryListener listener, long deviceAddr, int deviceClass, String deviceName, boolean paired) {
@@ -512,7 +512,7 @@ class BluetoothStackWIDCOMM implements BluetoothStack {
                             ServiceRecordImpl sr = new ServiceRecordImpl(BluetoothStackWIDCOMM.this, device, handles[i]);
                             try {
                                 sr.populateRecord(uuidFilerAttrIDs);
-                                // Apply JSR-82 filter, all UUID should be present
+                                // Apply JSR-82 apply, all UUID should be present
                                 for (int u = 0; u < uuidSet.length; u++) {
                                     if (!((sr.hasServiceClassUUID(uuidSet[u]) || sr.hasProtocolClassUUID(uuidSet[u])))) {
                                         if (BluetoothStackWIDCOMMSDPInputStream.debug) {

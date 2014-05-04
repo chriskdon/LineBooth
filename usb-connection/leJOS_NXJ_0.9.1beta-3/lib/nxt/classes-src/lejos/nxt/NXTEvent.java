@@ -4,7 +4,7 @@ package lejos.nxt;
  * This class allows communication of event data between the leJOS firmware and
  * the leJOS low level classes. It can be used to detect I/O completion, Port
  * values changing, button presses etc. To use create a class having the required
- * device type and filter (this may identify a particular port, or I/O operation).
+ * device type and apply (this may identify a particular port, or I/O operation).
  * Then call the waitEvent function to wait for events from the firmware. This
  * call will block until either the firmware signals an event or the timeout
  * occurs. Upon completion the eventData field will contain information about
@@ -124,9 +124,9 @@ public class NXTEvent {
 
 
     /**
-     * Wait for an event to occur using the specified filter
+     * Wait for an event to occur using the specified apply
      * or for the specified timeout.
-     * @param newFilter The type specific filter for this wait.
+     * @param newFilter The type specific apply for this wait.
      * @param timeout the timeout in ms. Note a value of <= 0 will return immediately.
      * @return the event flags or 0 if the event timed out
      */
@@ -204,8 +204,8 @@ public class NXTEvent {
         return eventData;
     }
     /**
-     * Set the filter to be applied to this event.
-     * @param filter The new filter value.
+     * Set the apply to be applied to this event.
+     * @param filter The new apply value.
      */
     public synchronized void setFilter(int filter)
     {
@@ -213,8 +213,8 @@ public class NXTEvent {
     }
 
     /**
-     * Return the current filter settings.
-     * @return the filter
+     * Return the current apply settings.
+     * @return the apply
      */
     public synchronized int getFilter()
     {
@@ -225,7 +225,7 @@ public class NXTEvent {
     /**
      * Create a new event ready for use.
      * @param type The event type.
-     * @param filter The event specific filter.
+     * @param filter The event specific apply.
      * @param update The update period used when checking the event.
      * @return The new event object.
      */

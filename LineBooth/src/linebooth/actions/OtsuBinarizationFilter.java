@@ -1,7 +1,6 @@
 package linebooth.actions;
 
-import linebooth.IPipelineAction;
-import linebooth.LineBoothState;
+import linebooth.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,7 +10,7 @@ import java.awt.image.BufferedImage;
  * Student #: 4810800
  * Date: 2014-04-16.
  */
-public class OtsuBinarization implements IPipelineAction<LineBoothState> {
+public class OtsuBinarizationFilter implements IFilter {
     /**
      * Get a grayscale histogram for an image.
      *
@@ -84,7 +83,8 @@ public class OtsuBinarization implements IPipelineAction<LineBoothState> {
     }
 
     @Override
-    public void action(LineBoothState state) {
-        binarize(state.getOutput(), state.getOutput());
+    public BufferedImage apply(BufferedImage img) {
+        binarize(img, img);
+        return img;
     }
 }

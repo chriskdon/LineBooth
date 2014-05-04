@@ -30,7 +30,7 @@ class ListenerThread extends Thread
     /**
      * Add a new listener.
      * @param eventType The event type used for this object
-     * @param filter The initial event filter
+     * @param filter The initial event apply
      * @param update How often to check for a change
      * @param lc The listener caller to call when things change
      */
@@ -70,7 +70,7 @@ class ListenerThread extends Thread
                         if (events[i].getEventData() > 0)
                         {
                             int ret = callers[i].callListeners();
-                            // Set the new filter data
+                            // Set the new apply data
                             events[i].setFilter(ret|NXTEvent.TIMEOUT);
                         }
                     }

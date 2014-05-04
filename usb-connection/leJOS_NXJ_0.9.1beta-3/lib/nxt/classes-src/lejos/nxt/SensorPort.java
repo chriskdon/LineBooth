@@ -60,7 +60,7 @@ public class SensorPort implements LegacySensorPort, I2CPort, ListenerCaller
         SensorPort.S1, SensorPort.S2, SensorPort.S3, SensorPort.S4
     };
 
-    /** I2C event filter bits */
+    /** I2C event apply bits */
     private static final int I2C_IO_COMPLETE = 1;
     private static final int I2C_BUS_FREE = 0x100;
     private static final int I2C_BUS_FREE_TIMEOUT = 10;
@@ -96,7 +96,7 @@ public class SensorPort implements LegacySensorPort, I2CPort, ListenerCaller
     private int i2cSensorCnt = 0;
     private boolean i2cHighSpeed = false;
     /**
-     * The event filter for a sensor port allows for less than and greater
+     * The event apply for a sensor port allows for less than and greater
      * then a target value (with a +/- tolerance).
      */
     private int listenerFilter = 0;
@@ -817,7 +817,7 @@ public class SensorPort implements LegacySensorPort, I2CPort, ListenerCaller
         type = -1;
         mode = MODE_RAW;
         curReader = offReader;
-        // set default listener filter
+        // set default listener apply
         listenerFilter = ((1<<iPortId) << GT_EVENT_SHIFT) | ((1<<iPortId) << LT_EVENT_SHIFT) | (DEFAULT_TOLERANCE << TOLERANCE_SHIFT);
         setType(TYPE_NO_SENSOR);
     }
@@ -1071,7 +1071,7 @@ public class SensorPort implements LegacySensorPort, I2CPort, ListenerCaller
 
     /**
      * Call Port Listeners. Used by ListenerThread.
-     * @return New event filter mask.
+     * @return New event apply mask.
      */
     public synchronized int callListeners()
     {

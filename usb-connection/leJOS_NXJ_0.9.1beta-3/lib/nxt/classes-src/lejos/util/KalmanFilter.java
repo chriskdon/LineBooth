@@ -6,7 +6,7 @@ package lejos.util;
  */
 
 /** 
- * Implementation of a Kalman filter using the Matrix class
+ * Implementation of a Kalman apply using the Matrix class
  */
 public class KalmanFilter {
   private Matrix a, b, c, i, q, r, at, ct;

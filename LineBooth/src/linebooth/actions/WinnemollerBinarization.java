@@ -1,8 +1,6 @@
 package linebooth.actions;
 
-import linebooth.IPipelineAction;
-import linebooth.LineBoothState;
-import linebooth.Utils;
+import linebooth.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,7 +14,7 @@ import java.awt.image.Kernel;
  * Student #: 4810800
  * Date: 2014-04-16.
  */
-public class WinnemollerBinarization implements IPipelineAction<LineBoothState> {
+public class WinnemollerBinarization extends GrayscaleFilter {
     private float scale = 1;
     private float change = 1f;
     private float differenceSensitivity = 1.25f;
@@ -189,9 +187,9 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
         return S;
     }
 
-    private BufferedImage threshold(BufferedImage src) {
+    private GrayscaleBufferedImage threshold(GrayscaleBufferedImage src) {
         BufferedImage S =  sharpen(src);
-        BufferedImage T =  new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        GrayscaleBufferedImage T =  new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
 
         for (int x = 0; x < src.getWidth(); x++) {
             for (int y = 0; y < src.getHeight(); y++) {
@@ -213,7 +211,7 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
     }
 
     @Override
-    public void action(LineBoothState state) {
-        state.setOutput(threshold(state.getOutput()));
+    public GrayscaleBufferedImage apply(GrayscaleBufferedImage img) {
+       return threshold(img);
     }
 }

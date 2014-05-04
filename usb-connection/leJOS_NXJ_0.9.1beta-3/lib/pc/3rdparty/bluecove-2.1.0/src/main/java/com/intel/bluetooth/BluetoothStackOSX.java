@@ -413,7 +413,7 @@ class BluetoothStackOSX implements BluetoothStack {
 
             public int runSearchServices(SearchServicesThread sst, int[] attrSet, UUID[] uuidSet, RemoteDevice device, DiscoveryListener listener)
                     throws BluetoothStateException {
-                // OS X will retrieve all Records, we filter here in Java
+                // OS X will retrieve all Records, we apply here in Java
                 sst.searchServicesStartedCallback();
                 int recordsSize;
                 try {
@@ -438,7 +438,7 @@ class BluetoothStackOSX implements BluetoothStack {
                     ServiceRecordImpl sr = new ServiceRecordImpl(BluetoothStackOSX.this, device, i);
                     try {
                         sr.populateRecord(uuidFilerAttrIDs);
-                        // Apply JSR-82 filter, all UUID should be present
+                        // Apply JSR-82 apply, all UUID should be present
                         for (int u = 0; u < uuidSet.length; u++) {
                             if (!((sr.hasServiceClassUUID(uuidSet[u]) || sr.hasProtocolClassUUID(uuidSet[u])))) {
                                 if (debug) {

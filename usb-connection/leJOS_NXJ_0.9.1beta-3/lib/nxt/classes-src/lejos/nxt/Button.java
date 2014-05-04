@@ -308,7 +308,7 @@ public class Button implements ListenerCaller
 
   /**
    * Call Button Listeners. Used by ListenerThread.
-   * @return New event filter
+   * @return New event apply
    */
   public synchronized int callListeners()
   {

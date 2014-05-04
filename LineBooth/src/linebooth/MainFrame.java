@@ -3,8 +3,7 @@ package linebooth;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import linebooth.actions.FloydSteinbergDither;
-import linebooth.actions.GrayScaleOutput;
+import linebooth.actions.FloydSteinbergDitherFilter;
 import linebooth.actions.WinnemollerBinarization;
 
 import javax.swing.*;
@@ -15,12 +14,13 @@ import java.awt.*;
  * Student #: 4810800
  * Date: 2014-04-30.
  */
-public class MainFrame extends DetectCloseFrame {
+public class MainFrame extends JFrame {
     private Dimension cameraSize = new Dimension(320, 240);
 
-    private ImageComponent imageComponent = new ImageComponent(cameraSize);
+    private ImagePanel imagePanel = new ImagePanel(cameraSize);
     private WinnemollerBinarization binarization = new WinnemollerBinarization(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180);
-    private PipelineTransformer<LineBoothState> pipeline;
+
+    private IFilter filter = new FloydSteinbergDitherFilter();
 
     public MainFrame() {
         super("LineBooth");
@@ -29,27 +29,22 @@ public class MainFrame extends DetectCloseFrame {
         this.setLayout(new GridLayout(2, 1));
 
         // Output
-        DetectClosePanel outputPanel = new DetectClosePanel(); // Contains the webcam and the effected imge
+        JPanel outputPanel = new JPanel(); // Contains the webcam and the effected imge
         outputPanel.setLayout(new GridLayout());
-
-        pipeline = new PipelineTransformer<LineBoothState>()
-                .action(new GrayScaleOutput())             // Change foreground and background to gray
-                        //.action(binarization);
-                .action(new FloydSteinbergDither());
 
         Webcam.getDefault().setViewSize(cameraSize);
         Webcam.getDefault().addWebcamListener(new WebcamEventHandler());
         Webcam.getDefault().open(true);
 
         // outputPanel.add(webcamPanel);
-        outputPanel.add(imageComponent);
+        outputPanel.add(imagePanel);
 
         // Controls
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new GridLayout());
 
         add(outputPanel);
-        // add(controlPanel);
+        add(controlPanel);
 
         setVisible(true);
         pack();
@@ -77,7 +72,7 @@ public class MainFrame extends DetectCloseFrame {
 
         @Override
         public void webcamImageObtained(WebcamEvent webcamEvent) {
-            imageComponent.setImage(pipeline.result(new LineBoothState(webcamEvent.getImage())).getOutput());
+            imagePanel.setImage(filter.apply(webcamEvent.getImage()));
 
             MainFrame.this.repaint();
         }

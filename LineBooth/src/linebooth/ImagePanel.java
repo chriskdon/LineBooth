@@ -12,10 +12,10 @@ import java.io.IOException;
  * Student #: 4810800
  * Date: 2014-04-13.
  */
-public class ImageComponent extends JPanel {
+public class ImagePanel extends JPanel {
     private BufferedImage img;
 
-    public ImageComponent(Dimension d) {
+    public ImagePanel(Dimension d) {
         this.setPreferredSize(d);
     }
 
