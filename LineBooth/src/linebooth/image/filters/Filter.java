@@ -13,5 +13,5 @@ public interface Filter {
      * @param img
      * @return
      */
-    public BufferedImage apply(BufferedImage img);
+    public BufferedImage apply(BufferedImage img, BufferedImage dest);
 }

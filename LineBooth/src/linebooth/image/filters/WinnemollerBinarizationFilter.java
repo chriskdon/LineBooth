@@ -158,10 +158,16 @@ public class WinnemollerBinarizationFilter extends GrayscaleFilter {
         return s;
     }
 
-    private GrayscaleBufferedImage threshold(GrayscaleBufferedImage src) {
+    private GrayscaleBufferedImage threshold(GrayscaleBufferedImage src, GrayscaleBufferedImage dest) {
         GrayscaleBufferedImage s = sharpen(src);
 
-        GrayscaleBufferedImage t = new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
+
+        GrayscaleBufferedImage t;
+        if (dest == null) {
+            t = new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
+        } else {
+            t = dest;
+        }
 
         for (int i = 0; i < t.getPixelData().length; i++) {
             int c = s.getGrayPixel(i);
@@ -179,10 +185,10 @@ public class WinnemollerBinarizationFilter extends GrayscaleFilter {
     }
 
     @Override
-    public GrayscaleBufferedImage apply(GrayscaleBufferedImage img) {
+    public GrayscaleBufferedImage apply(GrayscaleBufferedImage img, GrayscaleBufferedImage dest) {
         reset();
         src = img;
 
-        return threshold(img);
+        return threshold(img, dest);
     }
 }

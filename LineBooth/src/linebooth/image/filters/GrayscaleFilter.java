@@ -10,11 +10,17 @@ import java.awt.image.BufferedImage;
  * Date: 2014-05-03.
  */
 public abstract class GrayscaleFilter implements Filter {
-    public abstract GrayscaleBufferedImage apply(GrayscaleBufferedImage img);
+    public abstract GrayscaleBufferedImage apply(GrayscaleBufferedImage img, GrayscaleBufferedImage dest);
 
     @Override
-    public BufferedImage apply(BufferedImage img) {
-        return apply(new GrayscaleBufferedImage(img));
+    public BufferedImage apply(BufferedImage img, BufferedImage dest) {
+        GrayscaleBufferedImage out = null;
+
+        if (dest != null && !(dest instanceof GrayscaleBufferedImage)) {
+            out = new GrayscaleBufferedImage(dest);
+        }
+
+        return apply(new GrayscaleBufferedImage(img), out);
     }
 
     @Override

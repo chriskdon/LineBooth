@@ -7,12 +7,10 @@ import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
+import linebooth.image.GrayscaleBufferedImage;
 import linebooth.image.converters.ByteArrayConverter;
 import linebooth.image.converters.GrayscaleImageToByteArrayConverter;
-import linebooth.image.filters.Filter;
-import linebooth.image.filters.FloydSteinbergDitherFilter;
-import linebooth.image.filters.OtsuBinarizationFilter;
-import linebooth.image.filters.WinnemollerBinarizationFilter;
+import linebooth.image.filters.*;
 import linebooth.image.operations.BinaryOperation;
 import linebooth.image.operations.MergeImagesOperation;
 
@@ -60,6 +58,7 @@ public class MainFrame extends JFrame {
                 new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter()),
                 new FilterComboBoxItem("Winnemoller", new WinnemollerBinarizationFilter(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180)),
                 new FilterComboBoxItem("Otsu", new OtsuBinarizationFilter()),
+                new FilterComboBoxItem("Skin", new SkinFilter())
         });
 
         backgroundComboBox = new JComboBox<BackgroungComboBoxItem>(new BackgroungComboBoxItem[]{
@@ -141,6 +140,8 @@ public class MainFrame extends JFrame {
      * Handle the webcam events.
      */
     private class WebcamEventHandler implements WebcamListener {
+        private GrayscaleBufferedImage temp = new GrayscaleBufferedImage(cameraSize.width, cameraSize.height);
+
         @Override
         public void webcamOpen(WebcamEvent webcamEvent) {
 
@@ -174,8 +175,10 @@ public class MainFrame extends JFrame {
             if (filter == null) {
                 outputPanel.setImage(output);
             } else {
-                output = filter.apply(output);
+                long s = System.currentTimeMillis();
+                output = filter.apply(output, temp);
                 outputPanel.setImage(output);
+                System.out.println(System.currentTimeMillis() - s);
             }
         }
     }

@@ -50,6 +50,11 @@ public class GrayscaleBufferedImage extends BufferedImage {
         }
     }
 
+    @Override
+    public synchronized void setRGB(int x, int y, int rgb) {
+        super.setRGB(x, y, grayscale(rgb));
+    }
+
     public int[] getPixelData() {
         return pixelData;
     }
@@ -66,11 +71,11 @@ public class GrayscaleBufferedImage extends BufferedImage {
         return (argb & 0xFF000000) | (g << 16) | (g << 8) | g;
     }
 
-    public int getGrayPixel(int x, int y) {
+    public synchronized int getGrayPixel(int x, int y) {
         return this.getRGB(x, y) & 0xFF;
     }
 
-    public int getGrayPixel(int i) {
+    public synchronized int getGrayPixel(int i) {
         return getPixelData()[i] & 0xFF;
     }
 
@@ -85,19 +90,19 @@ public class GrayscaleBufferedImage extends BufferedImage {
         return value;
     }
 
-    public void setGrayPixel(int i, int value) {
+    public synchronized void setGrayPixel(int i, int value) {
         value = normalize(value);
 
         getPixelData()[i] = new Color(value, value, value).getRGB();
     }
 
-    public void setGrayPixel(int x, int y, int value) {
+    public synchronized void setGrayPixel(int x, int y, int value) {
         value = normalize(value);
 
         this.setRGB(x, y, new Color(value, value, value).getRGB());
     }
 
-    public void plusGrayPixel(int x, int y, int value) {
+    public synchronized void plusGrayPixel(int x, int y, int value) {
         setGrayPixel(x, y, getGrayPixel(x, y) + value);
     }
 }

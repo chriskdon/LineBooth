@@ -82,7 +82,7 @@ public class OtsuBinarizationFilter extends GrayscaleFilter {
     }
 
     @Override
-    public GrayscaleBufferedImage apply(GrayscaleBufferedImage img) {
-        return binarize(img, null);
+    public GrayscaleBufferedImage apply(GrayscaleBufferedImage img, GrayscaleBufferedImage dest) {
+        return binarize(img, dest);
     }
 }
