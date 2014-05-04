@@ -1,4 +1,4 @@
-import linebooth.MainFrame;
+import linebooth.ui.MainFrame;
 
 /**
  * IMPORTANT RESOURCES
@@ -10,8 +10,6 @@ import linebooth.MainFrame;
 
 public class Main {
     public static void main(String[] args) {
-        // Dithering?
-
         new MainFrame();
     }
 }

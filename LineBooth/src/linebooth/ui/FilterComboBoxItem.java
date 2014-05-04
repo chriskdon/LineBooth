@@ -1,6 +1,6 @@
 package linebooth.ui;
 
-import linebooth.IFilter;
+import linebooth.image.filters.IFilter;
 
 /**
  * Created by Chris Kellendonk
