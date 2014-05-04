@@ -1,4 +1,4 @@
-package LineBoothNXTCommunication;
+package linebooth.nxt;
 
 public class PrintJob {
     public static final int FOREGROUND_IMAGE = 2;

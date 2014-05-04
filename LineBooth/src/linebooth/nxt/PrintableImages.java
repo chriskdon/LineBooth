@@ -1,4 +1,4 @@
-package LineBoothNXTCommunication;
+package linebooth.nxt;
 
 public class PrintableImages {
     public static final byte[][] ditheredImage = {

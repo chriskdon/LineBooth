@@ -1,1 +1,0 @@
-jar cf ../../../../LineBooth/libs/LineBoothNXTCommunication.jar NxtConnection.class PrintJob.class PrintableImages.class
