@@ -41,8 +41,8 @@ public class Main {
         }
     }
 
-    private void printTEST() throws IOException {
-        nxtConnection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, PrintableImages.ditheredImage));
+    public void printTEST() throws IOException {
+        nxtConnection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, bike));
 //        sleep(5000);
 //        nxtConnection.sendPrintJob(new PrintJob(PrintJob.BACKGROUND_IMAGE, tempTESTbackground));
     }

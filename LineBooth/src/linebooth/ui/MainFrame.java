@@ -9,6 +9,8 @@ import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import linebooth.image.converters.GrayscaleImageToIntArrayConverter;
 import linebooth.image.converters.IntArrayConverter;
+import linebooth.image.extractor.Extractor;
+import linebooth.image.extractor.SubtractionExtractor;
 import linebooth.image.filters.*;
 import linebooth.image.operations.BinaryOperation;
 import linebooth.image.operations.MergeImagesOperation;
@@ -22,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.Arrays;
 
 /**
  * Created by Chris Kellendonk
@@ -39,8 +40,9 @@ public class MainFrame extends JFrame {
 
     private BinaryOperation mergeImages = new MergeImagesOperation();
     private IntArrayConverter converter = new GrayscaleImageToIntArrayConverter();
+    private Extractor foregroundExtrator = new SubtractionExtractor();
 
-    private BufferedImage output;
+    private BufferedImage background;
 
     public MainFrame() {
         super("LineBooth");
@@ -54,12 +56,13 @@ public class MainFrame extends JFrame {
 
         // Setup Comboboxes
         filterComboBox = new JComboBox<FilterComboBoxItem>(new FilterComboBoxItem[]{
+                new FilterComboBoxItem("Foreground", new ForegroundExtractionFilter()),
                 new FilterComboBoxItem("None", null),
                 new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter()),
                 new FilterComboBoxItem("Winnemoller", new WinnemollerBinarizationFilter(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180)),
                 new FilterComboBoxItem("Otsu", new OtsuBinarizationFilter()),
-                new FilterComboBoxItem("Skin", new SkinFilter()),
-                new FilterComboBoxItem("Foreground", new ForegroundExtractionFilter())
+                new FilterComboBoxItem("Skin", new SkinFilter())
+
         });
 
         backgroundComboBox = new JComboBox<BackgroungComboBoxItem>(new BackgroungComboBoxItem[]{
@@ -74,6 +77,8 @@ public class MainFrame extends JFrame {
         Webcam.getDefault().addWebcamListener(new WebcamEventHandler());
         Webcam.getDefault().open(true);
 
+
+
         // Controls
         JPanel controlPanel = new JPanel(new GridLayout(3, 2));
         controlPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -84,40 +89,48 @@ public class MainFrame extends JFrame {
         controlPanel.add(new JLabel("Filter"));
         controlPanel.add(filterComboBox);
 
-        controlPanel.add(new JLabel());
+        final JButton backgroundButton = new JButton("Get Background");
+        backgroundButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MainFrame.this.background = Webcam.getDefault().getImage();
+            }
+        });
+        controlPanel.add(backgroundButton);
+
         JButton printButton = new JButton("Print");
         printButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (output != null) {
-                    int[][] values =  converter.convert(output);
 
-                    String str = "{\n";
-                    for(int x = 0; x < values.length; x++) {
-                        str += "{";
-                        for(int y = 0; y < values[x].length; y++) {
-                            str += values[x][y];
 
-                            if(y + 1 < values[x].length) {
-                                str += ",";
-                            }
-                        }
-                        str += "}";
-                        if(x + 1 < values.length) {
-                            str += ",\n";
-                        } else {
-                            str += "\n";
+                int[][] values = converter.convert(calculateImage(Webcam.getDefault().getImage()));
+
+                String str = "{\n";
+                for (int x = 0; x < values.length; x++) {
+                    str += "{";
+                    for (int y = 0; y < values[x].length; y++) {
+                        str += values[x][y];
+
+                        if (y + 1 < values[x].length) {
+                            str += ",";
                         }
                     }
                     str += "}";
-
-                    try {
-                        PrintWriter write = new PrintWriter("./output/test.txt", "UTF-8");
-                        write.write(str);
-                        write.close();
-                    } catch(Exception ex) {
-                        throw new RuntimeException(ex);
+                    if (x + 1 < values.length) {
+                        str += ",\n";
+                    } else {
+                        str += "\n";
                     }
+                }
+                str += "}";
+
+                try {
+                    PrintWriter write = new PrintWriter("./output/test.txt", "UTF-8");
+                    write.write(str);
+                    write.close();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         });
@@ -164,6 +177,27 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private BufferedImage calculateImage(BufferedImage image) {
+        Filter filter = ((FilterComboBoxItem) filterComboBox.getSelectedItem()).getFilter();
+        BufferedImage background = ((BackgroungComboBoxItem) backgroundComboBox.getSelectedItem()).getBackground();
+        BufferedImage output;
+
+        // Add Background
+        if (background != null) {
+            output = mergeImages.apply(imageToBufferedImage(image), background);
+        } else {
+            output = image;
+        }
+
+        // Apply Filter
+        if (filter == null) {
+            return output;
+        } else {//if(MainFrame.this.background != null) {
+            return filter.apply(output, null);
+            //return foregroundExtrator.extract(output, MainFrame.this.background, null);
+        }
+    }
+
     /**
      * Handle the webcam events.
      */
@@ -185,25 +219,7 @@ public class MainFrame extends JFrame {
 
         @Override
         public void webcamImageObtained(WebcamEvent webcamEvent) {
-            BufferedImage image = webcamEvent.getImage();
-
-            Filter filter = ((FilterComboBoxItem) filterComboBox.getSelectedItem()).getFilter();
-            BufferedImage background = ((BackgroungComboBoxItem) backgroundComboBox.getSelectedItem()).getBackground();
-
-            // Add Background
-            if (background != null) {
-                output = mergeImages.apply(imageToBufferedImage(image), background);
-            } else {
-                output = image;
-            }
-
-            // Apply Filter
-            if (filter == null) {
-                outputPanel.setImage(output);
-            } else {
-                output = filter.apply(output, null);
-                outputPanel.setImage(output);
-            }
+            outputPanel.setImage(calculateImage(webcamEvent.getImage()));
         }
     }
 }

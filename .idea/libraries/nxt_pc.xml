@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="nxt_pc">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/LineBooth/libs/nxt_pc" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/LineBooth/libs/nxt_pc/3rdparty/bluecove-2.1.0/src/main/java" />
+      <root url="file://$PROJECT_DIR$/LineBooth/libs/nxt_pc/3rdparty/bluecove-2.1.0/src/test/java" />
+      <root url="file://$PROJECT_DIR$/LineBooth/libs/nxt_pc" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/LineBooth/libs/nxt_pc" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/LineBooth/libs/nxt_pc" recursive="false" type="SOURCES" />
+  </library>
+</component>
