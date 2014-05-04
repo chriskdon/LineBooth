@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.PrintWriter;
 
 /**
  * Created by Chris Kellendonk
@@ -100,34 +99,12 @@ public class MainFrame extends JFrame {
         printButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-
                 int[][] values = converter.convert(calculateImage(Webcam.getDefault().getImage()));
 
-                String str = "{\n";
-                for (int x = 0; x < values.length; x++) {
-                    str += "{";
-                    for (int y = 0; y < values[x].length; y++) {
-                        str += values[x][y];
-
-                        if (y + 1 < values[x].length) {
-                            str += ",";
-                        }
-                    }
-                    str += "}";
-                    if (x + 1 < values.length) {
-                        str += ",\n";
-                    } else {
-                        str += "\n";
-                    }
-                }
-                str += "}";
-
                 try {
-                    PrintWriter write = new PrintWriter("./output/test.txt", "UTF-8");
-                    write.write(str);
-                    write.close();
-                } catch (Exception ex) {
+                    linebooth.nxt.Main test = new linebooth.nxt.Main();
+                    test.printTEST();
+                }   catch(Exception ex) {
                     throw new RuntimeException(ex);
                 }
             }

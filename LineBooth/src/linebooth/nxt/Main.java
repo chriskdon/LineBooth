@@ -1,4 +1,4 @@
-package LineBoothNXTCommunication;
+package linebooth.nxt;
 
 import lejos.pc.comm.NXTCommException;
 
