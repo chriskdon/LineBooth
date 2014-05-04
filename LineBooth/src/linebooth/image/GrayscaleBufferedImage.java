@@ -99,7 +99,7 @@ public class GrayscaleBufferedImage extends BufferedImage {
     public synchronized void setGrayPixel(int x, int y, int value) {
         value = normalize(value);
 
-        this.setRGB(x, y, new Color(value, value, value).getRGB());
+        super.setRGB(x, y, new Color(value, value, value).getRGB());
     }
 
     public synchronized void plusGrayPixel(int x, int y, int value) {

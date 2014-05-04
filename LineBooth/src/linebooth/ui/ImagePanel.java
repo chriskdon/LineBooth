@@ -16,7 +16,7 @@ public class ImagePanel extends JPanel {
     private BufferedImage img;
 
     public ImagePanel(Dimension d) {
-        super(true);
+        // super(true);
         this.setPreferredSize(d);
     }
 

@@ -10,6 +10,6 @@ import java.awt.image.BufferedImage;
 public class ForegroundExtractionFilter implements Filter {
     @Override
     public BufferedImage apply(BufferedImage img, BufferedImage dest) {
-        return null;
+        return img;
     }
 }

@@ -7,9 +7,8 @@ import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import linebooth.image.GrayscaleBufferedImage;
-import linebooth.image.converters.ByteArrayConverter;
-import linebooth.image.converters.GrayscaleImageToByteArrayConverter;
+import linebooth.image.converters.GrayscaleImageToIntArrayConverter;
+import linebooth.image.converters.IntArrayConverter;
 import linebooth.image.filters.*;
 import linebooth.image.operations.BinaryOperation;
 import linebooth.image.operations.MergeImagesOperation;
@@ -22,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
@@ -30,7 +30,7 @@ import java.util.Arrays;
  * Date: 2014-04-30.
  */
 public class MainFrame extends JFrame {
-    private Dimension cameraSize = new Dimension(320, 240);
+    private Dimension cameraSize = new Dimension(176, 144);
 
     private ImagePanel outputPanel = new ImagePanel(cameraSize);
 
@@ -38,7 +38,7 @@ public class MainFrame extends JFrame {
     private JComboBox<BackgroungComboBoxItem> backgroundComboBox;
 
     private BinaryOperation mergeImages = new MergeImagesOperation();
-    private ByteArrayConverter converter = new GrayscaleImageToByteArrayConverter();
+    private IntArrayConverter converter = new GrayscaleImageToIntArrayConverter();
 
     private BufferedImage output;
 
@@ -58,7 +58,8 @@ public class MainFrame extends JFrame {
                 new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter()),
                 new FilterComboBoxItem("Winnemoller", new WinnemollerBinarizationFilter(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180)),
                 new FilterComboBoxItem("Otsu", new OtsuBinarizationFilter()),
-                new FilterComboBoxItem("Skin", new SkinFilter())
+                new FilterComboBoxItem("Skin", new SkinFilter()),
+                new FilterComboBoxItem("Foreground", new ForegroundExtractionFilter())
         });
 
         backgroundComboBox = new JComboBox<BackgroungComboBoxItem>(new BackgroungComboBoxItem[]{
@@ -89,7 +90,34 @@ public class MainFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (output != null) {
-                    System.out.println(Arrays.toString(converter.convert(output)));
+                    int[][] values =  converter.convert(output);
+
+                    String str = "{\n";
+                    for(int x = 0; x < values.length; x++) {
+                        str += "{";
+                        for(int y = 0; y < values[x].length; y++) {
+                            str += values[x][y];
+
+                            if(y + 1 < values[x].length) {
+                                str += ",";
+                            }
+                        }
+                        str += "}";
+                        if(x + 1 < values.length) {
+                            str += ",\n";
+                        } else {
+                            str += "\n";
+                        }
+                    }
+                    str += "}";
+
+                    try {
+                        PrintWriter write = new PrintWriter("./output/test.txt", "UTF-8");
+                        write.write(str);
+                        write.close();
+                    } catch(Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
@@ -140,8 +168,6 @@ public class MainFrame extends JFrame {
      * Handle the webcam events.
      */
     private class WebcamEventHandler implements WebcamListener {
-        private GrayscaleBufferedImage temp = new GrayscaleBufferedImage(cameraSize.width, cameraSize.height);
-
         @Override
         public void webcamOpen(WebcamEvent webcamEvent) {
 
@@ -175,10 +201,8 @@ public class MainFrame extends JFrame {
             if (filter == null) {
                 outputPanel.setImage(output);
             } else {
-                long s = System.currentTimeMillis();
-                output = filter.apply(output, temp);
+                output = filter.apply(output, null);
                 outputPanel.setImage(output);
-                System.out.println(System.currentTimeMillis() - s);
             }
         }
     }
