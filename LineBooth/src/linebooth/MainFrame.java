@@ -1,5 +1,8 @@
 package linebooth;
 
+import com.apple.eawt.AppEvent;
+import com.apple.eawt.QuitHandler;
+import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
@@ -12,6 +15,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Filter;
+import com.apple.eawt.Application;
 
 /**
  * Created by Chris Kellendonk
@@ -22,7 +26,6 @@ public class MainFrame extends JFrame {
     private Dimension cameraSize = new Dimension(320, 240);
 
     private ImagePanel imagePanel = new ImagePanel(cameraSize);
-    private WinnemollerBinarization binarization = new WinnemollerBinarization(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180);
 
     private JComboBox<FilterComboBoxItem> filterCombobox;
 
@@ -33,13 +36,15 @@ public class MainFrame extends JFrame {
         this.setLayout(new GridLayout(2, 1));
 
         // Output
-        JPanel outputPanel = new JPanel(); // Contains the webcam and the effected imge
+        JPanel outputPanel = new JPanel();
         outputPanel.setLayout(new GridLayout());
 
         filterCombobox = new JComboBox<FilterComboBoxItem>(new FilterComboBoxItem[] {
                 new FilterComboBoxItem("None", null),
-                new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter())
+                new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter()),
+                new FilterComboBoxItem("Winnemoller", new WinnemollerBinarization(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180))
         });
+
 
         Webcam.getDefault().setViewSize(cameraSize);
         Webcam.getDefault().addWebcamListener(new WebcamEventHandler());
@@ -50,15 +55,26 @@ public class MainFrame extends JFrame {
 
         // Controls
         JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new GridLayout());
+        controlPanel.setLayout(new GridLayout(2,1));
         controlPanel.add(filterCombobox);
+        controlPanel.add(new JButton("Print"));
 
         add(outputPanel);
         add(controlPanel);
 
-        setVisible(true);
+        // Handle Quitting on OSX
+        Application.getApplication().setQuitHandler(new QuitHandler() {
+            @Override
+            public void handleQuitRequestWith(AppEvent.QuitEvent quitEvent, QuitResponse quitResponse) {
+                Webcam.getDefault().close();
+                System.exit(0);
+            }
+        });
+
+        // Show Window
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
     }
 
     /**
