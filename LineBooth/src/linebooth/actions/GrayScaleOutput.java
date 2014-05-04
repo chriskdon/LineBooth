@@ -11,16 +11,12 @@ import java.awt.image.DataBufferInt;
  * Student #: 4810800
  * Date: 2014-04-16.
  */
-public class GrayScaleForegroundBackground implements IPipelineAction<LineBoothState> {
+public class GrayScaleOutput implements IPipelineAction<LineBoothState> {
     @Override
     public void action(LineBoothState state) {
-        int[] fData = ((DataBufferInt) state.getForeground().getRaster().getDataBuffer()).getData();
-        int[] bData = ((DataBufferInt) state.getBackground().getRaster().getDataBuffer()).getData();
         int[] oData = ((DataBufferInt) state.getOutput().getRaster().getDataBuffer()).getData();
 
         for (int i = 0; i < state.getWidth() * state.getHeight(); i++) {
-            fData[i] = grayscale(fData[i]);
-            bData[i] = grayscale(bData[i]);
             oData[i] = grayscale(oData[i]);
         }
     }

@@ -1,13 +1,4 @@
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamPanel;
-import linebooth.*;
-import linebooth.actions.*;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import linebooth.MainFrame;
 
 /**
  * IMPORTANT RESOURCES

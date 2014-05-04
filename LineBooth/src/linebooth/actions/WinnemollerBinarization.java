@@ -28,6 +28,10 @@ public class WinnemollerBinarization implements IPipelineAction<LineBoothState> 
         scale = x;
     }
 
+    public void setChange(float x) {
+        change = x;
+    }
+
 
     /**
      * Constructor

@@ -85,8 +85,6 @@ public class OtsuBinarization implements IPipelineAction<LineBoothState> {
 
     @Override
     public void action(LineBoothState state) {
-        BufferedImage src = state.getForeground();
-
-        binarize(src, state.getOutput());
+        binarize(state.getOutput(), state.getOutput());
     }
 }
