@@ -11,6 +11,9 @@ import linebooth.ui.MainFrame;
 
 public class Main {
     public static void main(String[] args) {
+        //System.out.println(System.getProperty("java.library.path"));
+        //System.loadLibrary("jfantom");
+
         try {
             LineBoothNXTCommunication.Main test = new LineBoothNXTCommunication.Main();
             test.printTEST();

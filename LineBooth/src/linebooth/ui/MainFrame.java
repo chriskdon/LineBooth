@@ -35,8 +35,8 @@ public class MainFrame extends JFrame {
 
     private ImagePanel outputPanel = new ImagePanel(cameraSize);
 
-    private JComboBox<FilterComboBoxItem> filterComboBox;
-    private JComboBox<BackgroungComboBoxItem> backgroundComboBox;
+    private JComboBox filterComboBox;
+    private JComboBox backgroundComboBox;
 
     private BinaryOperation mergeImages = new MergeImagesOperation();
     private IntArrayConverter converter = new GrayscaleImageToIntArrayConverter();
@@ -55,7 +55,7 @@ public class MainFrame extends JFrame {
         outputPanelBlock.setLayout(new GridLayout());
 
         // Setup Comboboxes
-        filterComboBox = new JComboBox<FilterComboBoxItem>(new FilterComboBoxItem[]{
+        filterComboBox = new JComboBox(new FilterComboBoxItem[]{
                 new FilterComboBoxItem("Foreground", new ForegroundExtractionFilter()),
                 new FilterComboBoxItem("None", null),
                 new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter()),
@@ -65,7 +65,7 @@ public class MainFrame extends JFrame {
 
         });
 
-        backgroundComboBox = new JComboBox<BackgroungComboBoxItem>(new BackgroungComboBoxItem[]{
+        backgroundComboBox = new JComboBox(new BackgroungComboBoxItem[]{
                 new BackgroungComboBoxItem("None", null),
                 new BackgroungComboBoxItem("Hex", getImage("./assets/hexback_320x240.png"))
         });
@@ -76,8 +76,6 @@ public class MainFrame extends JFrame {
         Webcam.getDefault().setViewSize(cameraSize);
         Webcam.getDefault().addWebcamListener(new WebcamEventHandler());
         Webcam.getDefault().open(true);
-
-
 
         // Controls
         JPanel controlPanel = new JPanel(new GridLayout(3, 2));
