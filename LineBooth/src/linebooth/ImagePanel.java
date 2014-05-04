@@ -25,15 +25,14 @@ public class ImagePanel extends JPanel {
      */
     public void setImage(BufferedImage img) {
         this.img = img;
-
-        this.repaint();
+        repaint();
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.clearRect(0, 0, this.getWidth(), this.getHeight());
+        // g.clearRect(0, 0, this.getWidth(), this.getHeight());
 
         if(img != null) {
             g.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);

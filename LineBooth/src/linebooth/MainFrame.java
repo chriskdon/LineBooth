@@ -1,6 +1,7 @@
 package linebooth;
 
 import com.apple.eawt.AppEvent;
+import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
@@ -12,10 +13,6 @@ import linebooth.ui.FilterComboBoxItem;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Filter;
-import com.apple.eawt.Application;
 
 /**
  * Created by Chris Kellendonk
@@ -26,6 +23,7 @@ public class MainFrame extends JFrame {
     private Dimension cameraSize = new Dimension(320, 240);
 
     private ImagePanel imagePanel = new ImagePanel(cameraSize);
+    private int imagePanelX, imagePanelY, imagePanelWidth, imagePanelHeight;
 
     private JComboBox<FilterComboBoxItem> filterCombobox;
 
@@ -39,7 +37,7 @@ public class MainFrame extends JFrame {
         JPanel outputPanel = new JPanel();
         outputPanel.setLayout(new GridLayout());
 
-        filterCombobox = new JComboBox<FilterComboBoxItem>(new FilterComboBoxItem[] {
+        filterCombobox = new JComboBox<FilterComboBoxItem>(new FilterComboBoxItem[]{
                 new FilterComboBoxItem("None", null),
                 new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter()),
                 new FilterComboBoxItem("Winnemoller", new WinnemollerBinarization(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180))
@@ -55,7 +53,7 @@ public class MainFrame extends JFrame {
 
         // Controls
         JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new GridLayout(2,1));
+        controlPanel.setLayout(new GridLayout(2, 1));
         controlPanel.add(filterCombobox);
         controlPanel.add(new JButton("Print"));
 
@@ -75,6 +73,11 @@ public class MainFrame extends JFrame {
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+
+        imagePanelX = imagePanel.getX();
+        imagePanelY = imagePanel.getY();
+        imagePanelWidth = imagePanel.getWidth();
+        imagePanelHeight = imagePanel.getHeight();
     }
 
     /**
@@ -98,15 +101,16 @@ public class MainFrame extends JFrame {
 
         @Override
         public void webcamImageObtained(WebcamEvent webcamEvent) {
-            IFilter filter = ((FilterComboBoxItem)filterCombobox.getSelectedItem()).getFilter();
+            long s = System.currentTimeMillis();
+            IFilter filter = ((FilterComboBoxItem) filterCombobox.getSelectedItem()).getFilter();
 
-            if(filter == null) {
+            if (filter == null) {
                 imagePanel.setImage(webcamEvent.getImage());
             } else {
                 imagePanel.setImage(filter.apply(webcamEvent.getImage()));
             }
 
-            MainFrame.this.repaint();
+            System.out.println(System.currentTimeMillis() - s);
         }
     }
 }

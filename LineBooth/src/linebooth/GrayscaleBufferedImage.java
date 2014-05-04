@@ -39,7 +39,7 @@ public class GrayscaleBufferedImage extends BufferedImage {
             iData = ((DataBufferInt) o.getRaster().getDataBuffer()).getData();
         }
 
-        int[] oData = ((DataBufferInt) getRaster().getDataBuffer()).getData();
+        int[] oData = getPixelData();
 
         if(skipGrayscaleConvert) {
             for (int i = 0; i < getWidth() * getHeight(); i++) {
@@ -57,6 +57,10 @@ public class GrayscaleBufferedImage extends BufferedImage {
         this(img, false);
     }
 
+    public int[] getPixelData() {
+        return ((DataBufferInt) getRaster().getDataBuffer()).getData();
+    }
+
     /**
      * Convert RGB to grayscale.
      *
@@ -71,6 +75,24 @@ public class GrayscaleBufferedImage extends BufferedImage {
 
     public int getGrayPixel(int x, int y) {
         return this.getRGB(x, y) & 0xFF;
+    }
+
+    public static int getGrayPixel(int value) {
+        return value & 0xFF;
+    }
+
+    public void setGrayPixel(int i, int value) {
+        if(value > 255) { value = 255; }
+        if(value < 0) { value = 0; }
+
+        getPixelData()[i] = new Color(value, value, value).getRGB();
+    }
+
+    public static void setGrayPixel(int[] data, int index, int value) {
+        if(value > 255) { value = 255; }
+        if(value < 0) { value = 0; }
+
+        data[index] = new Color(value, value, value).getRGB();
     }
 
     public void setGrayPixel(int x, int y, int value) {

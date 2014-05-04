@@ -1,6 +1,7 @@
 package linebooth.actions;
 
-import linebooth.*;
+import linebooth.GrayscaleBufferedImage;
+import linebooth.GrayscaleFilter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -21,15 +22,8 @@ public class WinnemollerBinarization extends GrayscaleFilter {
     private float sharpenAmount = 0.7f;
     private float thresholdSensitivity = 1.5f;
     private int threshold = 180;
-
-    public void setScale(float x) {
-        scale = x;
-    }
-
-    public void setChange(float x) {
-        change = x;
-    }
-
+    private BufferedImage src;
+    private GrayscaleBufferedImage l1, l2;
 
     /**
      * Constructor
@@ -47,63 +41,60 @@ public class WinnemollerBinarization extends GrayscaleFilter {
         this.threshold = threshold;
     }
 
+    public void setScale(float x) {
+        scale = x;
+    }
+
+    public void setChange(float x) {
+        change = x;
+    }
+
+    private void reset() {
+        src = l1 = l2 = null;
+    }
+
     /**
      * Get the centered gauss kernel
      *
      * @return 1D array of the kernel
      */
     private float[] centredGaussKernel(int size, float scale) {
-        //if(scale <= 1) { throw new IllegalArgumentException("Scaling factor must be > 1."); }
-
-        float[][] kernel = new float[size][size];
+        float[] kernel = new float[size * size];
 
         int radius = (size - 1) / 2;
 
         final float eulerPart = (float) (1f / (2f * Math.PI * (scale * scale)));
 
+        int i = 0;
         for (int y = -radius; y < size - radius; y++) {
             for (int x = -radius; x < size - radius; x++) {
                 float central = -(((y * y) + (x * x)) / (2f * (scale * scale)));
 
-                kernel[y + radius][x + radius] = eulerPart * (float) Math.exp(central);
+                kernel[i++] = eulerPart * (float) Math.exp(central);
             }
         }
 
-        // Utils.print(kernel);
-
-        return Utils.flatten(kernel);
+        return kernel;
     }
 
-    /**
-     * Make value between 0 - 255
-     *
-     * @param value
-     * @return
-     */
-    private int normalize(int value) {
-        if (value >= 255) {
-            return 255;
-        } else if (value <= 0) {
-            return 0;
-        } else {
-            return value;
+    private GrayscaleBufferedImage getL1() {
+        if (l1 == null) {
+            int size = (int) ((6 * scale) - 1);
+
+            ConvolveOp l1Op = new ConvolveOp(new Kernel(size, size, centredGaussKernel(size, scale)));
+            l1 = new GrayscaleBufferedImage(l1Op.filter(src, null), false);
         }
-    }
-
-    private BufferedImage getL1(BufferedImage src) {
-        int size = (int) ((6 * scale) - 1);
-
-        ConvolveOp l1Op = new ConvolveOp(new Kernel(size, size, centredGaussKernel(size, scale)));
-        BufferedImage l1 = l1Op.filter(src, null);
 
         return l1;
     }
 
-    private BufferedImage getL2(BufferedImage src) {
-        int otherSize = (int) ((6 * scale * change) - 1);
+    private GrayscaleBufferedImage getL2() {
+        if (l2 == null) {
+            int otherSize = (int) ((6 * scale * change) - 1);
 
-        ConvolveOp l2Op = new ConvolveOp(new Kernel(otherSize, otherSize, centredGaussKernel(otherSize, scale*change)));
-        BufferedImage l2 = l2Op.filter(src, null);
+            ConvolveOp l2Op = new ConvolveOp(new Kernel(otherSize, otherSize, centredGaussKernel(otherSize, scale * change)));
+            l2 = new GrayscaleBufferedImage(l2Op.filter(src, null));
+        }
 
         return l2;
     }
@@ -111,99 +102,83 @@ public class WinnemollerBinarization extends GrayscaleFilter {
     /**
      * Calculate the Difference of Gaussians (Concise Computer Vision - pg. 75)
      *
-     * @param src
      * @return
      */
-    private BufferedImage diffOfGauss(BufferedImage src) {
-        BufferedImage l1 = getL1(src);
-        BufferedImage l2 = getL2(src);
+    private GrayscaleBufferedImage diffOfGauss() {
+        int[] l1Data = getL1().getPixelData();
+        int[] l2Data = getL2().getPixelData();
 
-        BufferedImage dog = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        GrayscaleBufferedImage dog = new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
+        int[] dogData = dog.getPixelData();
 
-        for (int x = 0; x < src.getWidth(); x++) {
-            for (int y = 0; y < src.getHeight(); y++) {
-                Color c1 = new Color(l1.getRGB(x, y));
-                Color c2 = new Color(l2.getRGB(x, y));
+        for (int i = 0; i < dogData.length; i++) {
+            int c1 = GrayscaleBufferedImage.getGrayPixel(l1Data[i]);
+            int c2 = GrayscaleBufferedImage.getGrayPixel(l2Data[i]);
 
-                int bias = 0;
+            int bias = 0;
 
-                int red = normalize(c1.getRed() - (int)(c2.getRed() * differenceSensitivity) + bias);
-                int green = normalize(c1.getGreen() - (int)(c2.getGreen() * differenceSensitivity) + bias);
-                int blue = normalize(c1.getBlue() - (int)(c2.getBlue() * differenceSensitivity) + bias);
-
-                dog.setRGB(x, y, new Color(red, green, blue).getRGB());
-            }
+            GrayscaleBufferedImage.setGrayPixel(dogData, i, (c1 - (int)(c2 * differenceSensitivity) + bias));
         }
 
         return dog;
     }
 
-    private BufferedImage addToDog(BufferedImage src) {
-        BufferedImage oth = getL1(src);
-        BufferedImage dog = diffOfGauss(src);
+    private GrayscaleBufferedImage addToDog() {
+        int[] othData = getL1().getPixelData();
+        int[] dogData = diffOfGauss().getPixelData();
 
-        BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        GrayscaleBufferedImage out = new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
+        int[] oData = out.getPixelData();
 
-        for (int x = 0; x < dog.getWidth(); x++) {
-            for (int y = 0; y < dog.getHeight(); y++) {
-                Color dogC = new Color(dog.getRGB(x, y));
-                Color norm = new Color(oth.getRGB(x, y));
+        for (int i = 0; i < oData.length; i++) {
+            int norm = GrayscaleBufferedImage.getGrayPixel(othData[i]);
+            int dogC = GrayscaleBufferedImage.getGrayPixel(dogData[i]);
 
-                int bias = 0;
-                float t = 1f;
+            int bias = 0;
+            float t = 1f;
 
-                int red = normalize(norm.getRed() + (int)(dogC.getRed() * t) + bias);
-                int green = normalize(norm.getGreen() + (int)(dogC.getGreen() * t) + bias);
-                int blue = normalize(norm.getBlue() + (int)(dogC.getBlue() * t) + bias);
-
-                out.setRGB(x, y, new Color(red, green, blue).getRGB());
-            }
+            GrayscaleBufferedImage.setGrayPixel(oData, i, (norm + (int) (dogC * t) + bias));
         }
 
         return out;
     }
 
-    private BufferedImage sharpen(BufferedImage src) {
-        BufferedImage D = addToDog(src);
-        BufferedImage G = getL1(src);
+    private GrayscaleBufferedImage sharpen(GrayscaleBufferedImage src) {
+        int[] dData = addToDog().getPixelData();
+        int[] gData = getL1().getPixelData();
 
-        BufferedImage S =  new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        GrayscaleBufferedImage S = new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
+        int[] sData = S.getPixelData();
 
-        for (int x = 0; x < src.getWidth(); x++) {
-            for (int y = 0; y < src.getHeight(); y++) {
-                Color cG = new Color(G.getRGB(x, y));
-                Color cD = new Color(D.getRGB(x, y));
+        for (int i = 0; i < src.getWidth() * src.getHeight(); i++) {
+            int cG = GrayscaleBufferedImage.getGrayPixel(gData[i]);
+            int cD = GrayscaleBufferedImage.getGrayPixel(dData[i]);
 
-                int bias = 0;
+            int bias = 0;
 
-                int red = normalize(cG.getRed() + (int)(cD.getRed() * sharpenAmount) + bias);
-                int green = normalize(cG.getGreen() + (int)(cD.getGreen() * sharpenAmount) + bias);
-                int blue = normalize(cG.getBlue() + (int)(cD.getBlue() * sharpenAmount) + bias);
-
-                S.setRGB(x, y, new Color(red, green, blue).getRGB());
-            }
+            GrayscaleBufferedImage.setGrayPixel(sData, i, (cG + (int) (cD * sharpenAmount) + bias));
         }
 
         return S;
     }
 
     private GrayscaleBufferedImage threshold(GrayscaleBufferedImage src) {
-        BufferedImage S =  sharpen(src);
-        GrayscaleBufferedImage T =  new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
+        int[] sData = sharpen(src).getPixelData();
 
-        for (int x = 0; x < src.getWidth(); x++) {
-            for (int y = 0; y < src.getHeight(); y++) {
-                Color c = new Color(S.getRGB(x, y));
+        GrayscaleBufferedImage T = new GrayscaleBufferedImage(src.getWidth(), src.getHeight());
+        int[] tData = T.getPixelData();
 
-                if(c.getRed() >= threshold) {
-                    T.setRGB(x, y, new Color(255, 255, 255).getRGB());
-                } else {
-                    float bias = 0;
+        for(int i = 0; i < tData.length; i++) {
+            int c = GrayscaleBufferedImage.getGrayPixel(sData[i]);
 
-                    int value = (int)Math.tanh(thresholdSensitivity * (c.getRed() - bias));
+            if (c >= threshold) {
+                GrayscaleBufferedImage.setGrayPixel(tData, i, 255);
+            } else {
+                float bias = 0;
 
-                    T.setRGB(x, y, new Color(value, value, value).getRGB());
-                }
+                int value = (int) Math.tanh(thresholdSensitivity * (c - bias));
+
+                GrayscaleBufferedImage.setGrayPixel(tData, i, value);
             }
         }
 
@@ -212,6 +187,9 @@ public class WinnemollerBinarization extends GrayscaleFilter {
 
     @Override
     public GrayscaleBufferedImage apply(GrayscaleBufferedImage img) {
-       return threshold(img);
+        reset();
+        src = img;
+
+        return threshold(img);
     }
 }
