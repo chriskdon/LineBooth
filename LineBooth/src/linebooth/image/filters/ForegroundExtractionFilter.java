@@ -1,5 +1,6 @@
 package linebooth.image.filters;
 
+
 import java.awt.image.BufferedImage;
 
 /**
@@ -8,6 +9,7 @@ import java.awt.image.BufferedImage;
  * Date: 2014-05-04.
  */
 public class ForegroundExtractionFilter implements Filter {
+
     @Override
     public BufferedImage apply(BufferedImage img, BufferedImage dest) {
         return img;
