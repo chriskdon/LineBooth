@@ -7,13 +7,15 @@ import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import linebooth.image.converters.GrayscaleImageToIntArrayConverter;
-import linebooth.image.converters.IntArrayConverter;
+import linebooth.image.converters.BitPackedGrayImageConverter;
+import linebooth.image.converters.ImageToByteArrayConverter;
 import linebooth.image.extractor.Extractor;
 import linebooth.image.extractor.SubtractionExtractor;
 import linebooth.image.filters.*;
 import linebooth.image.operations.BinaryOperation;
 import linebooth.image.operations.MergeImagesOperation;
+import linebooth.nxt.*;
+import linebooth.nxt.PrintJob;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -38,7 +40,7 @@ public class MainFrame extends JFrame {
     private JComboBox backgroundComboBox;
 
     private BinaryOperation mergeImages = new MergeImagesOperation();
-    private IntArrayConverter converter = new GrayscaleImageToIntArrayConverter();
+    private ImageToByteArrayConverter converter = new BitPackedGrayImageConverter();
     private Extractor foregroundExtrator = new SubtractionExtractor();
 
     private BufferedImage background;
@@ -99,11 +101,12 @@ public class MainFrame extends JFrame {
         printButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[][] values = converter.convert(calculateImage(Webcam.getDefault().getImage()));
+                byte[] packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
 
                 try {
-                    linebooth.nxt.Main test = new linebooth.nxt.Main();
-                    test.printTEST();
+                    NxtConnection connection = new NxtConnection("Brain", "001653155151");
+                    connection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, packed));
+
                 }   catch(Exception ex) {
                     throw new RuntimeException(ex);
                 }

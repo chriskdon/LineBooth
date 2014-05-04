@@ -5,9 +5,9 @@ public class PrintJob {
     public static final int BACKGROUND_IMAGE = 3;
 
     private final int imageType;
-    private final byte[][] image;
+    private final byte[] image;
 
-    public PrintJob(int imageType, byte[][] image) {
+    public PrintJob(int imageType, byte[] image) {
         this.imageType = imageType;
         this.image = image;
     }
@@ -16,7 +16,7 @@ public class PrintJob {
         return imageType;
     }
 
-    public byte[][] getImage() {
+    public byte[] getImage() {
         return image;
     }
 }

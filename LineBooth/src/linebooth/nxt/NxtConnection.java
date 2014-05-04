@@ -21,12 +21,12 @@ public class NxtConnection {
         }
     }
 
-    public void sendForegroundImage(byte[][] foregroundImage) throws IOException {
+    public void sendForegroundImage(byte[] foregroundImage) throws IOException {
         nxtComm.write(intToByteArray(PrintJob.FOREGROUND_IMAGE));
         sendImage(foregroundImage);
     }
 
-    public void sendBackgroundImage(byte[][] backgroundImage) throws IOException {
+    public void sendBackgroundImage(byte[] backgroundImage) throws IOException {
         nxtComm.write(intToByteArray(PrintJob.BACKGROUND_IMAGE));
         sendImage(backgroundImage);
     }
@@ -36,9 +36,9 @@ public class NxtConnection {
         sendImage(printJob.getImage());
     }
 
-    private void sendImage(byte[][] image) throws IOException {
-        int rowLength = image.length;
-        int columnLength = image[0].length;
+    private void sendImage(byte[] packedImage) throws IOException {
+        int rowLength = packedImage.length;
+        int columnLength = packedImage.length;
 
         nxtComm.write(intToByteArray(rowLength));
         nxtComm.write(intToByteArray(columnLength));
@@ -47,7 +47,7 @@ public class NxtConnection {
         for(int row=0; row<rowLength; row++) {
             for(int column=0; column<columnLength; column++) {
 
-                imageBytes[column + columnLength*row] = image[row][column];
+                //imageBytes[column + columnLength*row] = packedImage[row][column];
                 //System.out.print(imageBytes[column + columnLength*row] + " ");
             }
         }

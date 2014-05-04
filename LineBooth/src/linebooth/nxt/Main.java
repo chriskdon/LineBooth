@@ -42,13 +42,13 @@ public class Main {
     }
 
     public void printTEST() throws IOException {
-        nxtConnection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, bike));
+        //nxtConnection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, bike));
 //        sleep(5000);
 //        nxtConnection.sendPrintJob(new PrintJob(PrintJob.BACKGROUND_IMAGE, tempTESTbackground));
     }
 
     public static void main(String[] args) throws IOException, NXTCommException {
-        Main main = new Main();
-        main.printTEST();
+        //Main main = new Main();
+        //main.printTEST();
     }
 }
