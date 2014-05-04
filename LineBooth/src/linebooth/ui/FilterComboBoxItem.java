@@ -1,6 +1,6 @@
 package linebooth.ui;
 
-import linebooth.image.filters.IFilter;
+import linebooth.image.filters.Filter;
 
 /**
  * Created by Chris Kellendonk
@@ -8,15 +8,15 @@ import linebooth.image.filters.IFilter;
  * Date: 2014-05-03.
  */
 public class FilterComboBoxItem {
-    private IFilter filter;
+    private Filter filter;
     private String text;
 
-    public FilterComboBoxItem(String text, IFilter filter) {
+    public FilterComboBoxItem(String text, Filter filter) {
         this.filter = filter;
         this.text = text;
     }
 
-    public IFilter getFilter() {
+    public Filter getFilter() {
         return filter;
     }
 
