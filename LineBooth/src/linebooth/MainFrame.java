@@ -5,9 +5,13 @@ import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import linebooth.actions.FloydSteinbergDitherFilter;
 import linebooth.actions.WinnemollerBinarization;
+import linebooth.ui.FilterComboBoxItem;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Filter;
 
 /**
  * Created by Chris Kellendonk
@@ -20,7 +24,7 @@ public class MainFrame extends JFrame {
     private ImagePanel imagePanel = new ImagePanel(cameraSize);
     private WinnemollerBinarization binarization = new WinnemollerBinarization(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180);
 
-    private IFilter filter = new FloydSteinbergDitherFilter();
+    private JComboBox<FilterComboBoxItem> filterCombobox;
 
     public MainFrame() {
         super("LineBooth");
@@ -32,6 +36,11 @@ public class MainFrame extends JFrame {
         JPanel outputPanel = new JPanel(); // Contains the webcam and the effected imge
         outputPanel.setLayout(new GridLayout());
 
+        filterCombobox = new JComboBox<FilterComboBoxItem>(new FilterComboBoxItem[] {
+                new FilterComboBoxItem("None", null),
+                new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter())
+        });
+
         Webcam.getDefault().setViewSize(cameraSize);
         Webcam.getDefault().addWebcamListener(new WebcamEventHandler());
         Webcam.getDefault().open(true);
@@ -42,6 +51,7 @@ public class MainFrame extends JFrame {
         // Controls
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new GridLayout());
+        controlPanel.add(filterCombobox);
 
         add(outputPanel);
         add(controlPanel);
@@ -72,7 +82,13 @@ public class MainFrame extends JFrame {
 
         @Override
         public void webcamImageObtained(WebcamEvent webcamEvent) {
-            imagePanel.setImage(filter.apply(webcamEvent.getImage()));
+            IFilter filter = ((FilterComboBoxItem)filterCombobox.getSelectedItem()).getFilter();
+
+            if(filter == null) {
+                imagePanel.setImage(webcamEvent.getImage());
+            } else {
+                imagePanel.setImage(filter.apply(webcamEvent.getImage()));
+            }
 
             MainFrame.this.repaint();
         }

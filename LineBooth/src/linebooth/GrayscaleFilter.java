@@ -14,4 +14,10 @@ public abstract class GrayscaleFilter implements IFilter {
     public BufferedImage apply(BufferedImage img) {
         return apply(new GrayscaleBufferedImage(img));
     }
+
+    @Override
+    public String toString() {
+        return "Grayscale Filter";
+    }
 }
+
