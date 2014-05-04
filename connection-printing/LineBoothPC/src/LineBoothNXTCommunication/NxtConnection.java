@@ -1,3 +1,5 @@
+package LineBoothNXTCommunication;
+
 import lejos.pc.comm.NXTComm;
 import lejos.pc.comm.NXTCommException;
 import lejos.pc.comm.NXTCommFactory;

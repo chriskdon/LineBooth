@@ -1,3 +1,5 @@
+package LineBoothNXTCommunication;
+
 import lejos.pc.comm.NXTCommException;
 
 import java.io.IOException;
