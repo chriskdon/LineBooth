@@ -4,16 +4,16 @@ import linebooth.image.converters.BitPackedImage;
 import linebooth.nxt.PrintJob;
 
 public class Printer implements Runnable {
-    private static final int PEN_MOVE = 75; //75
+    private static final int PEN_MOVE = 75; //DNC!
     private static final int PAPER_LENGTH = 1800;
     private static final int PAPER_WIDTH = 1550;
 
     private static final int LIGHT_SENSITIVITY = 20;
 
-    private static final double factor = 0.05;
+    private static final double factor = 0.09; //DNC!
 
-    private static final int SEGMENT_HORZ = 100;
-    private static final int SEGMENT_VERT = 80;
+    private static final int SEGMENT_HORZ = 110; //DNC!
+    private static final int SEGMENT_VERT = 90; //DNC!
 
     private static final NXTRegulatedMotor slideMotor = Motor.B;
     private static final NXTRegulatedMotor paperFeedMotor = Motor.A;
@@ -26,9 +26,9 @@ public class Printer implements Runnable {
     public Printer(PrinterController parent) {
         this.parent = parent;
 
-        slideMotor.setSpeed(1000);
-        paperFeedMotor.setSpeed(1000);
-        penMotor.setSpeed(1000);
+//        slideMotor.setSpeed(1000);
+//        paperFeedMotor.setSpeed(1000);
+//        penMotor.setSpeed(1000);
     }
 
     @Override
