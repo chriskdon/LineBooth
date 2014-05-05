@@ -102,7 +102,15 @@ public class MainFrame extends JFrame {
         printButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BitPackedImage packed = converter.convert(calculateImage(getImage("./assets/blocks.png")));
+                BitPackedImage packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
+
+                for(int y = 0; y < packed.getRows(); y++) {
+                    for(int x = 0; x < packed.getColumns(); x++) {
+                        System.out.print(packed.getPixel(x, y));
+                    }
+
+                    System.out.println();
+                }
 
                 try {
                     NxtConnection connection = new NxtConnection("Brain", "001653155151");
@@ -111,6 +119,7 @@ public class MainFrame extends JFrame {
                 }   catch(Exception ex) {
                     throw new RuntimeException(ex);
                 }
+
             }
         });
         controlPanel.add(printButton);

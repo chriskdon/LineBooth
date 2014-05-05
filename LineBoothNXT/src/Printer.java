@@ -8,6 +8,8 @@ public class Printer implements Runnable {
     private static final int PAPER_LENGTH = 1800;
     private static final int PAPER_WIDTH = 1550;
 
+    private static final int LIGHT_SENSITIVITY = 20;
+
     private static final double factor = 0.05;
 
     private static final int SEGMENT_HORZ = 100;
@@ -27,7 +29,7 @@ public class Printer implements Runnable {
 
     @Override
     public void run() {
-        paperSensor.setFloodlight(false); efddf
+        paperSensor.setFloodlight(false);
         sleep(100);
 
         while(true) {
@@ -55,44 +57,45 @@ public class Printer implements Runnable {
                 }
 
                 //Print Image
-                for(int r = 0; r < numberOfRows; r++) {
-                    for(int c = 0; c < numberOfColumns; c++) {
-                        /*if(image[r][c] == 1) {
+                for(int y = 0; y < numberOfRows; y++) {
+                    for(int x = 0; x < numberOfColumns; x++) {
+                        if(image.getPixel(x, y) == 1) {
                             penDown();
                             penUp();
                             right(factor);
 
                         } else {
                             int skip = 1;
-                            c++;
-                            while(c < numberOfColumns) {
+                            x++;
+                            while(x < numberOfColumns) {
 
-                                if(image[r][c] == 0) {
+                                if(image.getPixel(x, y) == 0) {
                                     skip++;
-                                    c++;
+                                    x++;
                                 } else {
-                                    c--; //to ensure 1 is accounted for in inner loop
+                                    x--; //to ensure 1 is accounted for in inner loop
                                     break;
                                 }
                             }
                             //go to the next row if we are to skip the rest of this row
-                            if (c >= numberOfColumns) {
+                            if (x >= numberOfColumns) {
                                 break;
                             } else {
                                 right(factor*skip);
                             }
-                        }*/
+                        }
 
                         if(Button.readButtons() != 0) { return; }
 
                         LCD.clear();
-                        System.out.println("Line: " + (r+1) +"/"+ numberOfRows);
-                        System.out.println("Completed: " + Math.round((float)(r+1)/numberOfRows*100) + "%");
+                        System.out.println("Line: " + (y+1) +"/"+ numberOfRows);
+                        System.out.println("Completed: " + Math.round((float)(y+1)/numberOfRows*100) + "%");
                     }
 
                     resetHorizontal();
                     up(factor);
                 }
+
                 resetPen();
 
                 if(currentPrintJob.getImageType() == PrintJob.BACKGROUND_IMAGE) { //eject the page out
@@ -155,7 +158,7 @@ public class Printer implements Runnable {
     // Get paper to start position
     private void loadPaper() {
         paperFeedMotor.forward();
-        while(paperSensor.getLightValue() > 50) { sleep(1); }
+        while(paperSensor.getLightValue() > LIGHT_SENSITIVITY) { sleep(1); }
         paperFeedMotor.stop();
     }
 
