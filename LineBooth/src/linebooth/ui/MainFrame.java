@@ -7,8 +7,9 @@ import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import linebooth.image.converters.BitPackedGrayImageConverter;
-import linebooth.image.converters.ImageToByteArrayConverter;
+import linebooth.image.converters.BitPackedImage;
+import linebooth.image.converters.GrayImagePacker;
+import linebooth.image.converters.BitPacker;
 import linebooth.image.extractor.Extractor;
 import linebooth.image.extractor.SubtractionExtractor;
 import linebooth.image.filters.*;
@@ -40,7 +41,7 @@ public class MainFrame extends JFrame {
     private JComboBox backgroundComboBox;
 
     private BinaryOperation mergeImages = new MergeImagesOperation();
-    private ImageToByteArrayConverter converter = new BitPackedGrayImageConverter();
+    private BitPacker converter = new GrayImagePacker();
     private Extractor foregroundExtrator = new SubtractionExtractor();
 
     private BufferedImage background;
@@ -101,7 +102,7 @@ public class MainFrame extends JFrame {
         printButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                byte[] packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
+                BitPackedImage packed = converter.convert(calculateImage(getImage("./assets/blocks.png")));
 
                 try {
                     NxtConnection connection = new NxtConnection("Brain", "001653155151");

@@ -4,6 +4,7 @@ import lejos.pc.comm.NXTComm;
 import lejos.pc.comm.NXTCommException;
 import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTInfo;
+import linebooth.image.converters.BitPackedImage;
 
 import java.io.IOException;
 
@@ -21,12 +22,12 @@ public class NxtConnection {
         }
     }
 
-    public void sendForegroundImage(byte[] foregroundImage) throws IOException {
+    public void sendForegroundImage(BitPackedImage foregroundImage) throws IOException {
         nxtComm.write(intToByteArray(PrintJob.FOREGROUND_IMAGE));
         sendImage(foregroundImage);
     }
 
-    public void sendBackgroundImage(byte[] backgroundImage) throws IOException {
+    public void sendBackgroundImage(BitPackedImage backgroundImage) throws IOException {
         nxtComm.write(intToByteArray(PrintJob.BACKGROUND_IMAGE));
         sendImage(backgroundImage);
     }
@@ -36,22 +37,11 @@ public class NxtConnection {
         sendImage(printJob.getImage());
     }
 
-    private void sendImage(byte[] packedImage) throws IOException {
-        int rowLength = packedImage.length;
-        int columnLength = packedImage.length;
+    private void sendImage(BitPackedImage packedImage) throws IOException {
+        nxtComm.write(intToByteArray(packedImage.getRows()));
+        nxtComm.write(intToByteArray(packedImage.getColumns()));
 
-        nxtComm.write(intToByteArray(rowLength));
-        nxtComm.write(intToByteArray(columnLength));
-
-        byte[] imageBytes = new byte[rowLength * columnLength];
-        for(int row=0; row<rowLength; row++) {
-            for(int column=0; column<columnLength; column++) {
-
-                //imageBytes[column + columnLength*row] = packedImage[row][column];
-                //System.out.print(imageBytes[column + columnLength*row] + " ");
-            }
-        }
-        nxtComm.write(imageBytes);
+        nxtComm.write(packedImage.getPackedImage());
     }
 
     private byte[] intToByteArray(int integer) {

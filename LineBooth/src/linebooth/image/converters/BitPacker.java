@@ -7,6 +7,6 @@ import java.awt.image.BufferedImage;
  * Student #: 4810800
  * Date: 2014-05-04.
  */
-public interface ImageToByteArrayConverter {
-    public byte[] convert(BufferedImage image);
+public interface BitPacker {
+    public BitPackedImage convert(BufferedImage image);
 }
