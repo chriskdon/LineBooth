@@ -1,5 +1,8 @@
 import lejos.nxt.*;
 
+import linebooth.image.converters.BitPackedImage;
+import linebooth.nxt.PrintJob;
+
 public class Printer implements Runnable {
     private static final int PEN_MOVE = 75; //75
     private static final int PAPER_LENGTH = 1800;
@@ -31,8 +34,9 @@ public class Printer implements Runnable {
             if(!parent.printJobQueue.isEmpty()) {
                 PrintJob currentPrintJob = parent.printJobQueue.remove(0); //removes the first element
 
-                byte[][]image = currentPrintJob.getImage();
-                int numberOfRows = image.length;
+                BitPackedImage image = currentPrintJob.getImage();
+                int numberOfRows = currentPrintJob.getImage().getRows();
+                int numberOfColumns = currentPrintJob.getImage().getColumns();
                 float percentageCompleted = 0;
 
                 switch (currentPrintJob.getImageType()) {
@@ -45,15 +49,15 @@ public class Printer implements Runnable {
                     case PrintJob.BACKGROUND_IMAGE:
 
                         resetHorizontal(); //reset horizontally
-                        down(factor*image.length); //reset vertically
+                        down(factor*numberOfRows); //reset vertically
                         initPen();
                         break;
                 }
 
                 //Print Image
                 for(int r = 0; r < numberOfRows; r++) {
-                    for(int c = 0; c < image[r].length; c++) {
-                        if(image[r][c] == 1) {
+                    for(int c = 0; c < numberOfColumns; c++) {
+                        /*if(image[r][c] == 1) {
                             penDown();
                             penUp();
                             right(factor);
@@ -61,7 +65,7 @@ public class Printer implements Runnable {
                         } else {
                             int skip = 1;
                             c++;
-                            while(c < image[r].length) {
+                            while(c < numberOfColumns) {
 
                                 if(image[r][c] == 0) {
                                     skip++;
@@ -72,12 +76,12 @@ public class Printer implements Runnable {
                                 }
                             }
                             //go to the next row if we are to skip the rest of this row
-                            if (c >= image[r].length) {
+                            if (c >= numberOfColumns) {
                                 break;
                             } else {
                                 right(factor*skip);
                             }
-                        }
+                        }*/
 
                         if(Button.readButtons() != 0) { return; }
 
