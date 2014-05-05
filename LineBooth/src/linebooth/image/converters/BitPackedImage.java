@@ -26,4 +26,10 @@ public class BitPackedImage {
     public int getColumns() {
         return columns;
     }
+
+    public int getPixel(int x, int y) {
+        int base = (getColumns() * y) + x;
+        //System.out.printf("Rows: %d, Cols: %d => (%d,%d)", getRows(), getColumns(), x, y);
+        return (getPackedImage()[base / 8] >> ((base - 1)%8)) & 0x1; // Pixel value
+    }
 }
