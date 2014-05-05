@@ -11,7 +11,7 @@ public class Printer implements Runnable {
     private static final double factor = 0.09;
 
     private static final int SEGMENT_HORZ = 110;
-    private static final int SEGMENT_VERT = 90;
+    private static final int SEGMENT_VERT = 110; // 100 -> 7.6v, 90 -> ?
 
     private static final int LIGHT_SENSITIVITY = 20;
 

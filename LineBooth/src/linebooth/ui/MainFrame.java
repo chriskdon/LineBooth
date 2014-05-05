@@ -8,14 +8,14 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import linebooth.image.converters.BitPackedImage;
-import linebooth.image.converters.GrayImagePacker;
 import linebooth.image.converters.BitPacker;
+import linebooth.image.converters.GrayImagePacker;
 import linebooth.image.extractor.Extractor;
 import linebooth.image.extractor.SubtractionExtractor;
 import linebooth.image.filters.*;
 import linebooth.image.operations.BinaryOperation;
 import linebooth.image.operations.MergeImagesOperation;
-import linebooth.nxt.*;
+import linebooth.nxt.NxtConnection;
 import linebooth.nxt.PrintJob;
 
 import javax.imageio.ImageIO;
@@ -34,9 +34,7 @@ import java.io.File;
  */
 public class MainFrame extends JFrame {
     private Dimension cameraSize = new Dimension(176, 144);
-
     private ImagePanel outputPanel = new ImagePanel(cameraSize);
-
     private JComboBox filterComboBox;
     private JComboBox backgroundComboBox;
 
@@ -64,7 +62,6 @@ public class MainFrame extends JFrame {
                 new FilterComboBoxItem("Winnemoller", new WinnemollerBinarizationFilter(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180)),
                 new FilterComboBoxItem("Otsu", new OtsuBinarizationFilter()),
                 new FilterComboBoxItem("Skin", new SkinFilter())
-
         });
 
         backgroundComboBox = new JComboBox(new BackgroungComboBoxItem[]{
@@ -76,6 +73,10 @@ public class MainFrame extends JFrame {
         outputPanelBlock.add(this.outputPanel);
 
         Webcam.getDefault().setViewSize(cameraSize);
+        Webcam.getDefault().setCustomViewSizes(new Dimension[] {
+                new Dimension(50,50)
+        });
+        Webcam.getDefault().setViewSize(new Dimension(50,50));
         Webcam.getDefault().addWebcamListener(new WebcamEventHandler());
         Webcam.getDefault().open(true);
 
@@ -104,8 +105,8 @@ public class MainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 BitPackedImage packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
 
-                for(int y = 0; y < packed.getRows(); y++) {
-                    for(int x = 0; x < packed.getColumns(); x++) {
+                for (int y = 0; y < packed.getRows(); y++) {
+                    for (int x = 0; x < packed.getColumns(); x++) {
                         System.out.print(packed.getPixel(x, y));
                     }
 
@@ -116,7 +117,7 @@ public class MainFrame extends JFrame {
                     NxtConnection connection = new NxtConnection("Brain", "001653155151");
                     connection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, packed));
 
-                }   catch(Exception ex) {
+                } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
 
