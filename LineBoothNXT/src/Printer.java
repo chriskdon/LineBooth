@@ -27,7 +27,7 @@ public class Printer implements Runnable {
 
     @Override
     public void run() {
-        paperSensor.setFloodlight(false);
+        paperSensor.setFloodlight(false); efddf
         sleep(100);
 
         while(true) {
