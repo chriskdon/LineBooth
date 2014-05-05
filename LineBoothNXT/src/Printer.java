@@ -25,6 +25,10 @@ public class Printer implements Runnable {
 
     public Printer(PrinterController parent) {
         this.parent = parent;
+
+        slideMotor.setSpeed(1000);
+        paperFeedMotor.setSpeed(1000);
+        penMotor.setSpeed(1000);
     }
 
     @Override
