@@ -11,16 +11,15 @@ import java.awt.image.BufferedImage;
  */
 public class GrayImagePacker implements BitPacker {
     public BitPackedImage convert(GrayscaleBufferedImage image) {
-        byte[] output = new byte[(int)Math.ceil((image.getHeight()*image.getWidth())/8.0)];
+        BitPackedImage packed = new BitPackedImage(image.getHeight(), image.getWidth());
 
-        for(int i = 0, byteNum = 0, bit = 7; i < image.getPixelData().length; i++) {
-            output[byteNum] |= (byte) ((image.getGrayPixel(i) > 128 ? 0 : 1) << bit);
-
-            bit--;
-            if(bit < 0) { bit = 7; byteNum++; } // New Byte
+        for(int x = 0; x < image.getWidth(); x++) {
+            for(int y = 0; y < image.getHeight(); y++) {
+                packed.setPixel(x, y, image.getGrayPixel(x, y) < 128);
+            }
         }
 
-        return new BitPackedImage(image.getHeight(), image.getWidth(), output);
+        return packed;
     }
 
     @Override

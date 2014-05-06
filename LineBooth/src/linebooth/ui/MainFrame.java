@@ -7,6 +7,7 @@ import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
+import linebooth.image.GrayscaleBufferedImage;
 import linebooth.image.converters.BitPackedImage;
 import linebooth.image.converters.BitPacker;
 import linebooth.image.converters.GrayImagePacker;
@@ -33,14 +34,22 @@ import java.io.File;
  * Date: 2014-04-30.
  */
 public class MainFrame extends JFrame {
-    private Dimension cameraSize = new Dimension(176, 144);
-    private ImagePanel outputPanel = new ImagePanel(cameraSize);
-    private JComboBox filterComboBox;
-    private JComboBox backgroundComboBox;
+    // Supported camera sizes
+    private static final Dimension[] CAMERA_SIZES = new Dimension[]{
+            new Dimension(25, 25),
+            new Dimension(50, 50),
+            new Dimension(100, 100)
+    };
+
+    private int cameraSizeIndex = 2;
+
+    private ImagePanel outputPanel = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
+    private ImagePanel outputPanel2 = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
+    private JComboBox filterComboBox, backgroundComboBox, dimensionsComboBox;
 
     private BinaryOperation mergeImages = new MergeImagesOperation();
     private BitPacker converter = new GrayImagePacker();
-    private Extractor foregroundExtrator = new SubtractionExtractor();
+    private Extractor foregroundExtractor = new SubtractionExtractor();
 
     private BufferedImage background;
 
@@ -49,10 +58,6 @@ public class MainFrame extends JFrame {
 
         // Webcam Example --> http://webcam-capture.sarxos.pl/
         this.setLayout(new GridLayout(2, 1));
-
-        // Output
-        JPanel outputPanelBlock = new JPanel();
-        outputPanelBlock.setLayout(new GridLayout());
 
         // Setup Comboboxes
         filterComboBox = new JComboBox(new FilterComboBoxItem[]{
@@ -69,26 +74,48 @@ public class MainFrame extends JFrame {
                 new BackgroungComboBoxItem("Hex", getImage("./assets/hexback_320x240.png"))
         });
 
-        // Image Panels
-        outputPanelBlock.add(this.outputPanel);
+        dimensionsComboBox = new JComboBox(DimensionComboBoxItem.create(CAMERA_SIZES));
+        dimensionsComboBox.setSelectedIndex(cameraSizeIndex);
+        dimensionsComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                final Dimension d = ((DimensionComboBoxItem)
+                        ((JComboBox) actionEvent.getSource()).getSelectedItem()).getDimension();
 
-        Webcam.getDefault().setViewSize(cameraSize);
-        Webcam.getDefault().setCustomViewSizes(new Dimension[] {
-                new Dimension(50,50)
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Webcam.getDefault().close();
+                        Webcam.getDefault().setViewSize(d);
+                        outputPanel.setSize(d);
+                        Webcam.getDefault().open(true);
+                    }
+                }).run();
+            }
         });
-        Webcam.getDefault().setViewSize(new Dimension(50,50));
+
+        // Image Panel
+        add(this.outputPanel);
+
+        System.out.println(outputPanel.getSize());
+
+        Webcam.getDefault().setCustomViewSizes(CAMERA_SIZES);
+        Webcam.getDefault().setViewSize(CAMERA_SIZES[cameraSizeIndex]);
         Webcam.getDefault().addWebcamListener(new WebcamEventHandler());
         Webcam.getDefault().open(true);
 
         // Controls
-        JPanel controlPanel = new JPanel(new GridLayout(3, 2));
+        JPanel controlPanel = new JPanel(new GridLayout(4, 2));
         controlPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        controlPanel.add(new JLabel("Background"));
-        controlPanel.add(backgroundComboBox);
+        controlPanel.add(new JLabel("Size"));
+        controlPanel.add(dimensionsComboBox);
 
         controlPanel.add(new JLabel("Filter"));
         controlPanel.add(filterComboBox);
+
+        controlPanel.add(new JLabel("Background"));
+        controlPanel.add(backgroundComboBox);
 
         final JButton backgroundButton = new JButton("Get Background");
         backgroundButton.addActionListener(new ActionListener() {
@@ -105,14 +132,6 @@ public class MainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 BitPackedImage packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
 
-                for (int y = 0; y < packed.getRows(); y++) {
-                    for (int x = 0; x < packed.getColumns(); x++) {
-                        System.out.print(packed.getPixel(x, y));
-                    }
-
-                    System.out.println();
-                }
-
                 try {
                     NxtConnection connection = new NxtConnection("Brain", "001653155151");
                     connection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, packed));
@@ -125,7 +144,6 @@ public class MainFrame extends JFrame {
         });
         controlPanel.add(printButton);
 
-        add(outputPanelBlock);
         add(controlPanel);
 
         // Handle Quitting on OSX
@@ -136,6 +154,8 @@ public class MainFrame extends JFrame {
                 System.exit(0);
             }
         });
+
+        add(outputPanel2);
 
         // Show Window
         pack();
@@ -198,7 +218,7 @@ public class MainFrame extends JFrame {
 
         @Override
         public void webcamClosed(WebcamEvent webcamEvent) {
-
+            outputPanel.setImage(null);
         }
 
         @Override
@@ -208,7 +228,18 @@ public class MainFrame extends JFrame {
 
         @Override
         public void webcamImageObtained(WebcamEvent webcamEvent) {
-            outputPanel.setImage(calculateImage(webcamEvent.getImage()));
+            BufferedImage image = calculateImage(webcamEvent.getImage());
+            BitPackedImage packed = converter.convert(image);
+            GrayscaleBufferedImage test = new GrayscaleBufferedImage(packed.getColumns(), packed.getRows());
+
+            for (int y = 0; y < packed.getRows(); y++) {
+                for (int x = 0; x < packed.getColumns(); x++) {
+                    test.setGrayPixel(x, y, (packed.getPixel(x, y) == 1 ? 0 : 255));
+                }
+            }
+
+            outputPanel.setImage(image);
+            outputPanel2.setImage(test);
         }
     }
 }

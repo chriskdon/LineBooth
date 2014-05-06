@@ -4,16 +4,16 @@ import linebooth.image.converters.BitPackedImage;
 import linebooth.nxt.PrintJob;
 
 public class Printer implements Runnable {
-    private static final int PEN_MOVE = 75;
+    private static final int PEN_MOVE = 70; // 75
     private static final int PAPER_LENGTH = 1800;
     private static final int PAPER_WIDTH = 1550;
 
     private static final double factor = 0.09;
 
-    private static final int SEGMENT_HORZ = 110;
-    private static final int SEGMENT_VERT = 110; // 100 -> 7.6v, 90 -> ?
+    private static final int SEGMENT_HORZ = 110; // 110 -> 7.6v
+    private static final int SEGMENT_VERT = 60; // 100 -> 7.6v, 90 -> ?
 
-    private static final int LIGHT_SENSITIVITY = 20;
+    private static final int LIGHT_SENSITIVITY = 25;
 
     private static final NXTRegulatedMotor slideMotor = Motor.B;
     private static final NXTRegulatedMotor paperFeedMotor = Motor.A;
@@ -26,9 +26,9 @@ public class Printer implements Runnable {
     public Printer(PrinterController parent) {
         this.parent = parent;
 
-//        slideMotor.setSpeed(1000);
-//        paperFeedMotor.setSpeed(1000);
-//        penMotor.setSpeed(1000);
+        slideMotor.setSpeed(1000);
+        paperFeedMotor.setSpeed(1000);
+        penMotor.setSpeed(1000);
     }
 
     @Override
@@ -37,6 +37,8 @@ public class Printer implements Runnable {
         sleep(100);
 
         while(true) {
+            if(Button.readButtons() != 0) { resetPen(); return; }
+
             if(!parent.printJobQueue.isEmpty()) {
                 PrintJob currentPrintJob = parent.printJobQueue.remove(0); //removes the first element
 
@@ -64,10 +66,22 @@ public class Printer implements Runnable {
                 for(int y = 0; y < numberOfRows; y++) {
                     for(int x = 0; x < numberOfColumns; x++) {
                         if(image.getPixel(x, y) == 1) {
-                            penDown();
-                            penUp();
-                            right(factor);
+                            // Next Pixel is also black
+                            int skip = 1;
+                            x++;
+                            while(x < numberOfColumns) {
+                                if(image.getPixel(x, y) == 1) {
+                                    skip++;
+                                    x++;
+                                } else {
+                                    x--; //to ensure 1 is accounted for in inner loop
+                                    break;
+                                }
+                            }
 
+                            penDown();
+                            right(factor*skip);
+                            penUp();
                         } else {
                             int skip = 1;
                             x++;
@@ -89,7 +103,7 @@ public class Printer implements Runnable {
                             }
                         }
 
-                        if(Button.readButtons() != 0) { return; }
+                        if(Button.readButtons() != 0) { resetPen(); return; }
 
                         LCD.clear();
                         System.out.println("Line: " + (y+1) +"/"+ numberOfRows);
