@@ -16,7 +16,6 @@ public class ImagePanel extends JPanel {
     private BufferedImage img;
 
     public ImagePanel(Dimension d) {
-        // super(true);
         this.setPreferredSize(d);
     }
 
@@ -33,10 +32,10 @@ public class ImagePanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // g.clearRect(0, 0, this.getWidth(), this.getHeight());
-
         if(img != null) {
             g.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
+        } else {
+            g.clearRect(0, 0, this.getWidth(), this.getHeight());
         }
     }
 }
