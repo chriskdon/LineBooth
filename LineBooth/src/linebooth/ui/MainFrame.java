@@ -82,15 +82,17 @@ public class MainFrame extends JFrame {
                 final Dimension d = ((DimensionComboBoxItem)
                         ((JComboBox) actionEvent.getSource()).getSelectedItem()).getDimension();
 
+                // Switch Webcam dimensions
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         Webcam.getDefault().close();
                         Webcam.getDefault().setViewSize(d);
                         outputPanel.setSize(d);
+                        outputPanel2.setSize(d);
                         Webcam.getDefault().open(true);
                     }
-                }).run();
+                }).start();
             }
         });
 
