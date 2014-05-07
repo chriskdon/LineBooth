@@ -10,10 +10,13 @@ public class BitPackedImage {
     private int rows, columns;
 
     public BitPackedImage(int rows, int columns) {
+        this(rows, columns, new byte[(int)Math.ceil((rows*columns)/8.0)]);
+    }
+
+    public BitPackedImage(int rows, int columns, byte[] image) {
         this.rows = rows;
         this.columns = columns;
-        this.packedImage = new byte[(int)Math.ceil((rows*columns)/8.0)];
-        ;
+        this.packedImage = image;
     }
 
     public byte[] getPackedImage() {

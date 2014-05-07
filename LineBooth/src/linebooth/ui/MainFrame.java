@@ -41,7 +41,7 @@ public class MainFrame extends JFrame {
             new Dimension(100, 100)
     };
 
-    private int cameraSizeIndex = 2;
+    private int cameraSizeIndex = 0;
 
     private ImagePanel outputPanel = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
     private ImagePanel outputPanel2 = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
@@ -133,6 +133,13 @@ public class MainFrame extends JFrame {
                 BitPackedImage packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
 
                 try {
+                    for (int y = 0; y < packed.getRows(); y++) {
+                        for (int x = 0; x < packed.getColumns(); x++) {
+                           System.out.print(packed.getPixel(x, y));
+                        }
+                        System.out.println();
+                    }
+
                     NxtConnection connection = new NxtConnection("Brain", "001653155151");
                     connection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, packed));
 
