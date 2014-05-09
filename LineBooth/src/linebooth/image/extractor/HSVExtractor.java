@@ -9,8 +9,13 @@ public class HSVExtractor implements Extractor {
 
     @Override
     public BufferedImage extract(BufferedImage foreground, BufferedImage background, BufferedImage dest) {
-        BufferedImage output = new BufferedImage(foreground.getWidth(), foreground.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        int clusterThreshold = output.getHeight()*output.getWidth()/3;  //Threshold is 1/3 of the pixels in the image
+        BufferedImage output = dest;
+
+        if (output == null) {
+            output = new BufferedImage(foreground.getWidth(), foreground.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        }
+
+        int clusterThreshold = output.getHeight() * output.getWidth() / 3;  //Threshold is 1/3 of the pixels in the image
 
         extractByHSV(foreground, background, output);
 
@@ -240,7 +245,7 @@ public class HSVExtractor implements Extractor {
             for (PixelState pixel : clusterNodesHashMap.values()) {
                 int x = pixel.getX();
                 int y = pixel.getY();
-                image.setRGB(x, y, original.getRGB(x,y));
+                image.setRGB(x, y, original.getRGB(x, y));
                 transparentPixels.remove(pixel);
             }
         }

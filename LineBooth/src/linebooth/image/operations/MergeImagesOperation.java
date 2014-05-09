@@ -20,10 +20,10 @@ public class MergeImagesOperation implements BinaryOperation {
      */
     @Override
     public BufferedImage apply(BufferedImage foreground, BufferedImage background) {
-
         if (foreground.getWidth() != background.getWidth() || foreground.getHeight() != background.getHeight()) {
             throw new IllegalArgumentException("Foreground and Background must have the same dimensions.");
         }
+
 
         int[] fData = ((DataBufferInt) foreground.getRaster().getDataBuffer()).getData();
         int[] bData = ((DataBufferInt) background.getRaster().getDataBuffer()).getData();

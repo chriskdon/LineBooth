@@ -7,12 +7,11 @@ import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import linebooth.image.GrayscaleBufferedImage;
 import linebooth.image.converters.BitPackedImage;
 import linebooth.image.converters.BitPacker;
 import linebooth.image.converters.GrayImagePacker;
 import linebooth.image.extractor.Extractor;
-import linebooth.image.extractor.SubtractionExtractor;
+import linebooth.image.extractor.HSVExtractor;
 import linebooth.image.filters.*;
 import linebooth.image.operations.BinaryOperation;
 import linebooth.image.operations.MergeImagesOperation;
@@ -41,15 +40,14 @@ public class MainFrame extends JFrame {
             new Dimension(100, 100)
     };
 
-    private int cameraSizeIndex = 0;
+    private int cameraSizeIndex = 2;
 
     private ImagePanel outputPanel = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
-    private ImagePanel outputPanel2 = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
     private JComboBox filterComboBox, backgroundComboBox, dimensionsComboBox;
 
     private BinaryOperation mergeImages = new MergeImagesOperation();
     private BitPacker converter = new GrayImagePacker();
-    private Extractor foregroundExtractor = new SubtractionExtractor();
+    private Extractor foregroundExtractor = new HSVExtractor();
 
     private BufferedImage background;
 
@@ -57,7 +55,7 @@ public class MainFrame extends JFrame {
         super("LineBooth");
 
         // Webcam Example --> http://webcam-capture.sarxos.pl/
-        this.setLayout(new GridLayout(2, 1));
+        //this.setLayout(new GridLayout(2, 1));
 
         // Setup Comboboxes
         filterComboBox = new JComboBox(new FilterComboBoxItem[]{
@@ -76,30 +74,10 @@ public class MainFrame extends JFrame {
 
         dimensionsComboBox = new JComboBox(DimensionComboBoxItem.create(CAMERA_SIZES));
         dimensionsComboBox.setSelectedIndex(cameraSizeIndex);
-        dimensionsComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                final Dimension d = ((DimensionComboBoxItem)
-                        ((JComboBox) actionEvent.getSource()).getSelectedItem()).getDimension();
-
-                // Switch Webcam dimensions
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Webcam.getDefault().close();
-                        Webcam.getDefault().setViewSize(d);
-                        outputPanel.setSize(d);
-                        outputPanel2.setSize(d);
-                        Webcam.getDefault().open(true);
-                    }
-                }).start();
-            }
-        });
+        dimensionsComboBox.addActionListener(new DimensionComboBoxHandler());
 
         // Image Panel
-        add(this.outputPanel);
-
-        System.out.println(outputPanel.getSize());
+        add("Center", this.outputPanel);
 
         Webcam.getDefault().setCustomViewSizes(CAMERA_SIZES);
         Webcam.getDefault().setViewSize(CAMERA_SIZES[cameraSizeIndex]);
@@ -107,53 +85,27 @@ public class MainFrame extends JFrame {
         Webcam.getDefault().open(true);
 
         // Controls
-        JPanel controlPanel = new JPanel(new GridLayout(4, 2));
+        JPanel controlPanel = new JPanel(new GridLayout(5, 2));
         controlPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         controlPanel.add(new JLabel("Size"));
         controlPanel.add(dimensionsComboBox);
 
-        controlPanel.add(new JLabel("Filter"));
-        controlPanel.add(filterComboBox);
-
         controlPanel.add(new JLabel("Background"));
         controlPanel.add(backgroundComboBox);
 
+        controlPanel.add(new JLabel("Filter"));
+        controlPanel.add(filterComboBox);
+
         final JButton backgroundButton = new JButton("Get Background");
-        backgroundButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                MainFrame.this.background = Webcam.getDefault().getImage();
-            }
-        });
+        backgroundButton.addActionListener(new GetBackgroundHandler());
         controlPanel.add(backgroundButton);
 
         JButton printButton = new JButton("Print");
-        printButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                BitPackedImage packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
-
-                try {
-                    for (int y = 0; y < packed.getRows(); y++) {
-                        for (int x = 0; x < packed.getColumns(); x++) {
-                           System.out.print(packed.getPixel(x, y));
-                        }
-                        System.out.println();
-                    }
-
-                    NxtConnection connection = new NxtConnection("Brain", "001653155151");
-                    connection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, packed));
-
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-
-            }
-        });
+        printButton.addActionListener(new PrinterButtonHandler());
         controlPanel.add(printButton);
 
-        add(controlPanel);
+        add("South", controlPanel);
 
         // Handle Quitting on OSX
         Application.getApplication().setQuitHandler(new QuitHandler() {
@@ -164,7 +116,6 @@ public class MainFrame extends JFrame {
             }
         });
 
-        add(outputPanel2);
 
         // Show Window
         pack();
@@ -195,14 +146,32 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private BufferedImage resizeImage(BufferedImage i, Dimension d) {
+        BufferedImage r = new BufferedImage((int)d.getWidth(), (int)d.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g = r.createGraphics();
+        g.drawImage(i, 0, 0, (int)d.getWidth(), (int)d.getHeight(), null);
+        g.dispose();
+
+        return r;
+    }
+
     private BufferedImage calculateImage(BufferedImage image) {
         Filter filter = ((FilterComboBoxItem) filterComboBox.getSelectedItem()).getFilter();
-        BufferedImage background = ((BackgroungComboBoxItem) backgroundComboBox.getSelectedItem()).getBackground();
+        BufferedImage backgroundOverlay = ((BackgroungComboBoxItem) backgroundComboBox.getSelectedItem()).getBackground();
         BufferedImage output;
 
         // Add Background
-        if (background != null) {
-            output = mergeImages.apply(imageToBufferedImage(image), background);
+        if (background != null && backgroundOverlay != null) {
+            BufferedImage foreground = imageToBufferedImage(image);
+
+            if (foreground.getWidth() != backgroundOverlay.getWidth() || foreground.getHeight() != backgroundOverlay.getHeight()) {
+                backgroundOverlay = resizeImage(backgroundOverlay, ((DimensionComboBoxItem)dimensionsComboBox.getSelectedItem()).getDimension());
+            }
+
+            BufferedImage extracted = foregroundExtractor.extract(foreground, background, null);
+
+            output = mergeImages.apply(extracted, backgroundOverlay); // Merge background
         } else {
             output = image;
         }
@@ -210,9 +179,8 @@ public class MainFrame extends JFrame {
         // Apply Filter
         if (filter == null) {
             return output;
-        } else {//if(MainFrame.this.background != null) {
+        } else {
             return filter.apply(output, null);
-            //return foregroundExtrator.extract(output, MainFrame.this.background, null);
         }
     }
 
@@ -221,9 +189,7 @@ public class MainFrame extends JFrame {
      */
     private class WebcamEventHandler implements WebcamListener {
         @Override
-        public void webcamOpen(WebcamEvent webcamEvent) {
-
-        }
+        public void webcamOpen(WebcamEvent webcamEvent) {}
 
         @Override
         public void webcamClosed(WebcamEvent webcamEvent) {
@@ -231,24 +197,68 @@ public class MainFrame extends JFrame {
         }
 
         @Override
-        public void webcamDisposed(WebcamEvent webcamEvent) {
-
-        }
+        public void webcamDisposed(WebcamEvent webcamEvent) {}
 
         @Override
         public void webcamImageObtained(WebcamEvent webcamEvent) {
             BufferedImage image = calculateImage(webcamEvent.getImage());
-            BitPackedImage packed = converter.convert(image);
-            GrayscaleBufferedImage test = new GrayscaleBufferedImage(packed.getColumns(), packed.getRows());
-
-            for (int y = 0; y < packed.getRows(); y++) {
-                for (int x = 0; x < packed.getColumns(); x++) {
-                    test.setGrayPixel(x, y, (packed.getPixel(x, y) == 1 ? 0 : 255));
-                }
-            }
 
             outputPanel.setImage(image);
-            outputPanel2.setImage(test);
+        }
+    }
+
+    /**
+     * Send the image to the NXT Printer
+     */
+    private class PrinterButtonHandler implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new Thread() { // Send data to the printer
+                @Override
+                public void run() {
+                    BitPackedImage packed = converter.convert(calculateImage(Webcam.getDefault().getImage()));
+
+                    try {
+                        NxtConnection connection = new NxtConnection("Brain", "001653155151");
+                        connection.sendPrintJob(new PrintJob(PrintJob.FOREGROUND_IMAGE, packed));
+
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }.start();
+        }
+    }
+
+    /**
+     * Save the baseline background image
+     */
+    private class GetBackgroundHandler implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            MainFrame.this.background = Webcam.getDefault().getImage();
+        }
+    }
+
+    /**
+     * Used to change the dimesnions on the camera image.
+     */
+    private class DimensionComboBoxHandler implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            final Dimension d = ((DimensionComboBoxItem)
+                    ((JComboBox) actionEvent.getSource()).getSelectedItem()).getDimension();
+
+            // Switch Webcam dimensions
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Webcam.getDefault().close();
+                    Webcam.getDefault().setViewSize(d);
+                    outputPanel.setSize(d);
+                    Webcam.getDefault().open(true);
+                }
+            }).start();
         }
     }
 }
