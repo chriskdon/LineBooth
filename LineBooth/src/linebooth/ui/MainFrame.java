@@ -11,7 +11,6 @@ import linebooth.image.GrayscaleBufferedImage;
 import linebooth.image.converters.BitPackedImage;
 import linebooth.image.converters.BitPacker;
 import linebooth.image.converters.GrayImagePacker;
-import linebooth.image.extractor.Extractor;
 import linebooth.image.extractor.HSVExtractor;
 import linebooth.image.filters.*;
 import linebooth.image.operations.BinaryOperation;
@@ -54,6 +53,8 @@ public class MainFrame extends JFrame {
 
     private BufferedImage background;
 
+    private JPanel extractionControls, bottom;
+
     public MainFrame() {
         super("LineBooth");
 
@@ -74,6 +75,14 @@ public class MainFrame extends JFrame {
                 new BackgroundComboBoxItem("Swirl", getImage("./assets/background_swirl.png"))
         });
 
+        backgroundComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Image b = ((BackgroundComboBoxItem) backgroundComboBox.getSelectedItem()).getBackground();
+                setExtractionControlVisibility((b == null ? false : true));
+            }
+        });
+
         dimensionsComboBox = new JComboBox(DimensionComboBoxItem.create(CAMERA_SIZES));
         dimensionsComboBox.setSelectedIndex(cameraSizeIndex);
         dimensionsComboBox.addActionListener(new DimensionComboBoxHandler());
@@ -88,7 +97,7 @@ public class MainFrame extends JFrame {
         Webcam.getDefault().open(true);
 
         // Controls
-        JPanel controlPanel = new JPanel(new GridLayout(7, 2));
+        JPanel controlPanel = new JPanel(new GridLayout(4, 2));
         controlPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         controlPanel.add(new JLabel("Size"));
@@ -109,31 +118,40 @@ public class MainFrame extends JFrame {
         printButton.addActionListener(new PrinterButtonHandler());
         controlPanel.add(printButton);
 
-        controlPanel.add(new JLabel("Hue"));
-        controlPanel.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getHueThreshold(), new JFloatSlider.FloatActionEvent() {
+        extractionControls = new JPanel(new GridLayout(3, 2));
+
+        extractionControls.add(new JLabel("Hue"));
+        extractionControls.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getHueThreshold(), new JFloatSlider.FloatActionEvent() {
             @Override
             public void valueChanged(float value) {
                 foregroundExtractor.setHueThreshold(value);
             }
         }));
 
-        controlPanel.add(new JLabel("Saturation"));
-        controlPanel.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getSaturationThreshold(), new JFloatSlider.FloatActionEvent() {
+        extractionControls.add(new JLabel("Saturation"));
+        extractionControls.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getSaturationThreshold(), new JFloatSlider.FloatActionEvent() {
             @Override
             public void valueChanged(float value) {
                 foregroundExtractor.setSaturationThreshold(value);
             }
         }));
 
-        controlPanel.add(new JLabel("Brightness"));
-        controlPanel.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getBrightnessThreshold(), new JFloatSlider.FloatActionEvent() {
+
+        extractionControls.add(new JLabel("Brightness"));
+        extractionControls.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getBrightnessThreshold(), new JFloatSlider.FloatActionEvent() {
             @Override
             public void valueChanged(float value) {
                 foregroundExtractor.setBrightnessThreshold(value);
             }
         }));
 
-        add("South", controlPanel);
+        bottom = new JPanel(new GridLayout(1, 1));
+
+        bottom.add(controlPanel);
+
+        add("South", bottom);
+
+        setExtractionControlVisibility(false);
 
         // Handle Quitting on OSX
         Application.getApplication().setQuitHandler(new QuitHandler() {
@@ -149,6 +167,18 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         setVisible(true);
+    }
+
+    private void setExtractionControlVisibility(boolean isVisible) {
+        if(isVisible) {
+            bottom.setLayout(new GridLayout(2, 1));
+            bottom.add(extractionControls);
+        } else {
+            bottom.setLayout(new GridLayout(1, 1));
+            bottom.remove(extractionControls);
+        }
+
+        pack();
     }
 
     public static BufferedImage copyImage(Image im) {
