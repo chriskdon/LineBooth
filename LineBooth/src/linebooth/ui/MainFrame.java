@@ -7,6 +7,7 @@ import com.apple.eawt.QuitResponse;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
+import linebooth.image.GrayscaleBufferedImage;
 import linebooth.image.converters.BitPackedImage;
 import linebooth.image.converters.BitPacker;
 import linebooth.image.converters.GrayImagePacker;
@@ -43,19 +44,18 @@ public class MainFrame extends JFrame {
     private int cameraSizeIndex = 2;
 
     private ImagePanel outputPanel = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
+    private ImagePanel packedPanel = new ImagePanel(CAMERA_SIZES[cameraSizeIndex]);
+
     private JComboBox filterComboBox, backgroundComboBox, dimensionsComboBox;
 
-    private BinaryOperation mergeImages = new MergeImagesOperation();
-    private BitPacker converter = new GrayImagePacker();
-    private Extractor foregroundExtractor = new HSVExtractor();
+    private BinaryOperation mergeImages = new MergeImagesOperation();    // Merge images
+    private BitPacker converter = new GrayImagePacker();                 // Pack images for printing
+    private Extractor foregroundExtractor = new HSVExtractor();          // Extract foreground
 
     private BufferedImage background;
 
     public MainFrame() {
         super("LineBooth");
-
-        // Webcam Example --> http://webcam-capture.sarxos.pl/
-        //this.setLayout(new GridLayout(2, 1));
 
         // Setup Comboboxes
         filterComboBox = new JComboBox(new FilterComboBoxItem[]{
@@ -77,7 +77,8 @@ public class MainFrame extends JFrame {
         dimensionsComboBox.addActionListener(new DimensionComboBoxHandler());
 
         // Image Panel
-        add("North", this.outputPanel);
+        add("West", this.outputPanel);
+        add("East", this.packedPanel);
 
         Webcam.getDefault().setCustomViewSizes(CAMERA_SIZES);
         Webcam.getDefault().setViewSize(CAMERA_SIZES[cameraSizeIndex]);
@@ -117,14 +118,14 @@ public class MainFrame extends JFrame {
             }
         });
 
-
         // Show Window
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
         setVisible(true);
     }
 
-    public static BufferedImage imageToBufferedImage(Image im) {
+    public static BufferedImage copyImage(Image im) {
         BufferedImage bufImg = new BufferedImage(im.getWidth(null), im.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         Graphics graph = bufImg.getGraphics();
         graph.drawImage(im, 0, 0, null);
@@ -141,17 +142,17 @@ public class MainFrame extends JFrame {
      */
     public static BufferedImage getImage(String path) {
         try {
-            return imageToBufferedImage(ImageIO.read(new File(path)));
+            return copyImage(ImageIO.read(new File(path)));
         } catch (Exception ex) {
             throw new RuntimeException("Could not load: " + ex);
         }
     }
 
     private BufferedImage resizeImage(BufferedImage i, Dimension d) {
-        BufferedImage r = new BufferedImage((int)d.getWidth(), (int)d.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage r = new BufferedImage((int) d.getWidth(), (int) d.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g = r.createGraphics();
-        g.drawImage(i, 0, 0, (int)d.getWidth(), (int)d.getHeight(), null);
+        g.drawImage(i, 0, 0, (int) d.getWidth(), (int) d.getHeight(), null);
         g.dispose();
 
         return r;
@@ -164,10 +165,10 @@ public class MainFrame extends JFrame {
 
         // Add Background
         if (background != null && backgroundOverlay != null) {
-            BufferedImage foreground = imageToBufferedImage(image);
+            BufferedImage foreground = copyImage(image);
 
             if (foreground.getWidth() != backgroundOverlay.getWidth() || foreground.getHeight() != backgroundOverlay.getHeight()) {
-                backgroundOverlay = resizeImage(backgroundOverlay, ((DimensionComboBoxItem)dimensionsComboBox.getSelectedItem()).getDimension());
+                backgroundOverlay = resizeImage(backgroundOverlay, ((DimensionComboBoxItem) dimensionsComboBox.getSelectedItem()).getDimension());
             }
 
             BufferedImage extracted = foregroundExtractor.extract(foreground, background, null);
@@ -185,12 +186,26 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private BufferedImage bitPackedToImage(BitPackedImage packedImage) {
+        GrayscaleBufferedImage image = new GrayscaleBufferedImage(packedImage.getColumns(),
+                packedImage.getRows());
+
+        for (int x = 0; x < packedImage.getColumns(); x++) {
+            for (int y = 0; y < packedImage.getRows(); y++) {
+                image.setGrayPixel(x, y, (packedImage.getPixel(x, y) == 1 ? 0 : 255));
+            }
+        }
+
+        return image;
+    }
+
     /**
      * Handle the webcam events.
      */
     private class WebcamEventHandler implements WebcamListener {
         @Override
-        public void webcamOpen(WebcamEvent webcamEvent) {}
+        public void webcamOpen(WebcamEvent webcamEvent) {
+        }
 
         @Override
         public void webcamClosed(WebcamEvent webcamEvent) {
@@ -198,13 +213,15 @@ public class MainFrame extends JFrame {
         }
 
         @Override
-        public void webcamDisposed(WebcamEvent webcamEvent) {}
+        public void webcamDisposed(WebcamEvent webcamEvent) {
+        }
 
         @Override
         public void webcamImageObtained(WebcamEvent webcamEvent) {
             BufferedImage image = calculateImage(webcamEvent.getImage());
 
             outputPanel.setImage(image);
+            packedPanel.setImage(bitPackedToImage(converter.convert(image)));
         }
     }
 
@@ -237,7 +254,7 @@ public class MainFrame extends JFrame {
     private class GetBackgroundHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainFrame.this.background = imageToBufferedImage(Webcam.getDefault().getImage());
+            MainFrame.this.background = copyImage(Webcam.getDefault().getImage());
             backgroundComboBox.setEnabled(true);
         }
     }
@@ -258,6 +275,7 @@ public class MainFrame extends JFrame {
                     Webcam.getDefault().close();
                     Webcam.getDefault().setViewSize(d);
                     outputPanel.setSize(d);
+                    packedPanel.setSize(d);
                     Webcam.getDefault().open(true);
                 }
             }).start();
