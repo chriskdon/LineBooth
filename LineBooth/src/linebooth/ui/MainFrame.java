@@ -62,7 +62,7 @@ public class MainFrame extends JFrame {
                 new FilterComboBoxItem("Foreground", new ForegroundExtractionFilter()),
                 new FilterComboBoxItem("None", null),
                 new FilterComboBoxItem("Dither", new FloydSteinbergDitherFilter()),
-                new FilterComboBoxItem("Winnemoller", new WinnemollerBinarizationFilter(1f, 1.6f, 1.25f, 0.7f, 1.5f, 180)),
+                new FilterComboBoxItem("Winnemoller", new WinnemollerBinarizationFilter(1.2f, 4.2f, 5.25f, 3.9f, 5.5f, 250)),
                 new FilterComboBoxItem("Otsu", new OtsuBinarizationFilter()),
                 new FilterComboBoxItem("Skin", new SkinFilter())
         });
