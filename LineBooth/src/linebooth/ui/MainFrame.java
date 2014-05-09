@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
 
     private BinaryOperation mergeImages = new MergeImagesOperation();    // Merge images
     private BitPacker converter = new GrayImagePacker();                 // Pack images for printing
-    private Extractor foregroundExtractor = new HSVExtractor();          // Extract foreground
+    private HSVExtractor foregroundExtractor = new HSVExtractor();          // Extract foreground
 
     private BufferedImage background;
 
@@ -88,7 +88,7 @@ public class MainFrame extends JFrame {
         Webcam.getDefault().open(true);
 
         // Controls
-        JPanel controlPanel = new JPanel(new GridLayout(5, 2));
+        JPanel controlPanel = new JPanel(new GridLayout(7, 2));
         controlPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         controlPanel.add(new JLabel("Size"));
@@ -108,6 +108,30 @@ public class MainFrame extends JFrame {
         JButton printButton = new JButton("Print");
         printButton.addActionListener(new PrinterButtonHandler());
         controlPanel.add(printButton);
+
+        controlPanel.add(new JLabel("Hue"));
+        controlPanel.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getHueThreshold(), new JFloatSlider.FloatActionEvent() {
+            @Override
+            public void valueChanged(float value) {
+                foregroundExtractor.setHueThreshold(value);
+            }
+        }));
+
+        controlPanel.add(new JLabel("Saturation"));
+        controlPanel.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getSaturationThreshold(), new JFloatSlider.FloatActionEvent() {
+            @Override
+            public void valueChanged(float value) {
+                foregroundExtractor.setSaturationThreshold(value);
+            }
+        }));
+
+        controlPanel.add(new JLabel("Brightness"));
+        controlPanel.add(new JFloatSlider(0f, 1f, 0.01f, foregroundExtractor.getBrightnessThreshold(), new JFloatSlider.FloatActionEvent() {
+            @Override
+            public void valueChanged(float value) {
+                foregroundExtractor.setBrightnessThreshold(value);
+            }
+        }));
 
         add("South", controlPanel);
 

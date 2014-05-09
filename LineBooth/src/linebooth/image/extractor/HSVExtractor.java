@@ -6,6 +6,33 @@ import java.util.HashMap;
 import java.util.Stack;
 
 public class HSVExtractor implements Extractor {
+    private float hueThreshold = 0.17f;
+    private float saturationThreshold = 0.1f;
+    private float brightnessThreshold = 0.2f;
+
+    public float getHueThreshold() {
+        return hueThreshold;
+    }
+
+    public void setHueThreshold(float hueThreshold) {
+        this.hueThreshold = hueThreshold;
+    }
+
+    public float getSaturationThreshold() {
+        return saturationThreshold;
+    }
+
+    public void setSaturationThreshold(float saturationThreshold) {
+        this.saturationThreshold = saturationThreshold;
+    }
+
+    public float getBrightnessThreshold() {
+        return brightnessThreshold;
+    }
+
+    public void setBrightnessThreshold(float brightnessThreshold) {
+        this.brightnessThreshold = brightnessThreshold;
+    }
 
     @Override
     public BufferedImage extract(BufferedImage foreground, BufferedImage background, BufferedImage dest) {
@@ -26,9 +53,9 @@ public class HSVExtractor implements Extractor {
     }
 
     public void extractByHSV(BufferedImage foreground, BufferedImage background, BufferedImage output) {
-        float hueThreshold = 0.17f;
-        float saturationThreshold = 0.1f;
-        float brightnessThreshold = 0.2f;
+        //float hueThreshold = 0.17f;
+        //float saturationThreshold = 0.1f;
+        //float brightnessThreshold = 0.2f;
         int pixelRadius = 1;
 
         for (int width = pixelRadius; width < output.getWidth() - pixelRadius; width++) {
