@@ -67,9 +67,11 @@ public class MainFrame extends JFrame {
                 new FilterComboBoxItem("Skin", new SkinFilter())
         });
 
-        backgroundComboBox = new JComboBox(new BackgroungComboBoxItem[]{
-                new BackgroungComboBoxItem("None", null),
-                new BackgroungComboBoxItem("Hex", getImage("./assets/hexback_320x240.png"))
+        backgroundComboBox = new JComboBox(new BackgroundComboBoxItem[]{
+                new BackgroundComboBoxItem("None", null),
+                new BackgroundComboBoxItem("Hex", getImage("./assets/hexback_320x240.png")),
+                new BackgroundComboBoxItem("Mario", getImage("./assets/background_mario.png")),
+                new BackgroundComboBoxItem("Swirl", getImage("./assets/background_swirl.png"))
         });
 
         dimensionsComboBox = new JComboBox(DimensionComboBoxItem.create(CAMERA_SIZES));
@@ -160,7 +162,7 @@ public class MainFrame extends JFrame {
 
     private BufferedImage calculateImage(BufferedImage image) {
         Filter filter = ((FilterComboBoxItem) filterComboBox.getSelectedItem()).getFilter();
-        BufferedImage backgroundOverlay = ((BackgroungComboBoxItem) backgroundComboBox.getSelectedItem()).getBackground();
+        BufferedImage backgroundOverlay = ((BackgroundComboBoxItem) backgroundComboBox.getSelectedItem()).getBackground();
         BufferedImage output;
 
         // Add Background

@@ -7,12 +7,12 @@ import java.awt.image.BufferedImage;
  * Student #: 4810800
  * Date: 2014-05-04.
  */
-public class BackgroungComboBoxItem {
+public class BackgroundComboBoxItem {
     private String text;
 
     private BufferedImage background;
 
-    public BackgroungComboBoxItem(String text, BufferedImage background) {
+    public BackgroundComboBoxItem(String text, BufferedImage background) {
         this.text = text;
         this.background = background;
     }
