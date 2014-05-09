@@ -236,7 +236,7 @@ public class MainFrame extends JFrame {
     private class GetBackgroundHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainFrame.this.background = Webcam.getDefault().getImage();
+            MainFrame.this.background = imageToBufferedImage(Webcam.getDefault().getImage());
         }
     }
 
