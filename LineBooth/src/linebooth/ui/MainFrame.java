@@ -77,7 +77,7 @@ public class MainFrame extends JFrame {
         dimensionsComboBox.addActionListener(new DimensionComboBoxHandler());
 
         // Image Panel
-        add("Center", this.outputPanel);
+        add("North", this.outputPanel);
 
         Webcam.getDefault().setCustomViewSizes(CAMERA_SIZES);
         Webcam.getDefault().setViewSize(CAMERA_SIZES[cameraSizeIndex]);
@@ -92,6 +92,7 @@ public class MainFrame extends JFrame {
         controlPanel.add(dimensionsComboBox);
 
         controlPanel.add(new JLabel("Background"));
+        backgroundComboBox.setEnabled(false);
         controlPanel.add(backgroundComboBox);
 
         controlPanel.add(new JLabel("Filter"));
@@ -237,6 +238,7 @@ public class MainFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             MainFrame.this.background = imageToBufferedImage(Webcam.getDefault().getImage());
+            backgroundComboBox.setEnabled(true);
         }
     }
 
